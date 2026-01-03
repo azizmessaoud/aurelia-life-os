@@ -59,10 +59,42 @@ export function useClearChat() {
   });
 }
 
+// Extract entities from conversation in the background
+async function extractEntitiesFromConversation(userMessage: string, assistantMessage: string) {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-entities`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          user_message: userMessage,
+          assistant_message: assistantMessage,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      console.warn("Entity extraction failed:", response.status);
+      return;
+    }
+
+    const result = await response.json();
+    console.log("Entities extracted:", result);
+  } catch (error) {
+    console.warn("Entity extraction error:", error);
+    // Don't throw - extraction is non-critical background task
+  }
+}
+
 export function useStreamingChat() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const saveMessage = useSaveMessage();
+  const queryClient = useQueryClient();
 
   const sendMessage = useCallback(
     async (
@@ -94,7 +126,7 @@ export function useStreamingChat() {
             body: JSON.stringify({
               message: userMessage,
               context,
-              conversationHistory: conversationHistory?.slice(-6), // Last 6 messages for context
+              conversationHistory: conversationHistory?.slice(-6),
             }),
           }
         );
@@ -151,6 +183,13 @@ export function useStreamingChat() {
         // Save assistant message
         if (fullContent) {
           await saveMessage.mutateAsync({ role: "assistant", content: fullContent });
+          
+          // Trigger entity extraction in the background (non-blocking)
+          extractEntitiesFromConversation(userMessage, fullContent);
+          
+          // Invalidate knowledge graph queries so UI updates if user navigates there
+          queryClient.invalidateQueries({ queryKey: ["knowledge_entities"] });
+          queryClient.invalidateQueries({ queryKey: ["knowledge_relationships"] });
         }
 
         setStreamingContent("");
@@ -162,7 +201,7 @@ export function useStreamingChat() {
         setIsStreaming(false);
       }
     },
-    [saveMessage]
+    [saveMessage, queryClient]
   );
 
   return {
