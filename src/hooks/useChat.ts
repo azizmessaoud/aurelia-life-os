@@ -72,7 +72,9 @@ export function useStreamingChat() {
         incomeStreams: any[];
         weeklyCapacity: any;
         todayMinutes: number;
-      }
+        recentSessions?: any[];
+      },
+      conversationHistory?: ChatMessage[]
     ) => {
       setIsStreaming(true);
       setStreamingContent("");
@@ -92,6 +94,7 @@ export function useStreamingChat() {
             body: JSON.stringify({
               message: userMessage,
               context,
+              conversationHistory: conversationHistory?.slice(-6), // Last 6 messages for context
             }),
           }
         );

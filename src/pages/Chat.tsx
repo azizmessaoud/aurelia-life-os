@@ -7,7 +7,7 @@ import { useChatMessages, useStreamingChat, useClearChat } from "@/hooks/useChat
 import { useActiveProjects } from "@/hooks/useProjects";
 import { useActiveIncomeStreams } from "@/hooks/useIncomeStreams";
 import { useCurrentWeekCapacity } from "@/hooks/useWeeklyCapacity";
-import { useTodaysDeepWorkMinutes } from "@/hooks/useDeepWork";
+import { useTodaysDeepWorkMinutes, useDeepWorkSessions } from "@/hooks/useDeepWork";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -44,9 +44,11 @@ function MessageBubble({ role, content, isStreaming }: { role: string; content: 
 const suggestedPrompts = [
   "What should I focus on today?",
   "Which income stream is most ADHD-friendly?",
-  "Why am I avoiding my top priority?",
-  "Help me plan this week realistically",
-  "What patterns do you see in my data?",
+  "Help me set a realistic goal using reverse goal setting",
+  "Am I overcommitted? Check my WIP limit",
+  "What patterns do you see in my deep work data?",
+  "I'm feeling overwhelmed. Help me reset.",
+  "Review my weekly capacity - what's my ADHD tax?",
 ];
 
 export default function ChatPage() {
@@ -55,6 +57,7 @@ export default function ChatPage() {
   const { data: incomeStreams = [] } = useActiveIncomeStreams();
   const { data: weeklyCapacity } = useCurrentWeekCapacity();
   const { data: todayMinutes = 0 } = useTodaysDeepWorkMinutes();
+  const { data: recentSessions = [] } = useDeepWorkSessions();
   const { sendMessage, isStreaming, streamingContent } = useStreamingChat();
   const clearChat = useClearChat();
 
@@ -79,7 +82,8 @@ export default function ChatPage() {
         incomeStreams,
         weeklyCapacity,
         todayMinutes,
-      });
+        recentSessions: recentSessions.slice(0, 10),
+      }, messages);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to send message");
     }
