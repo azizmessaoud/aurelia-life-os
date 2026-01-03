@@ -5,7 +5,8 @@ import {
   TrendingUp, 
   DollarSign, 
   MessageSquare,
-  Sparkles
+  Sparkles,
+  Network
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ const navItems = [
   { icon: Timer, label: "Deep Work", path: "/deep-work" },
   { icon: TrendingUp, label: "Capacity", path: "/capacity" },
   { icon: DollarSign, label: "Income Streams", path: "/income" },
+  { icon: Network, label: "Knowledge Graph", path: "/knowledge" },
   { icon: MessageSquare, label: "Chat with AURELIA", path: "/chat" },
 ];
 

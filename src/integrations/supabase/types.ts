@@ -133,6 +133,90 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_entities: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          entity_type: string
+          frequency: number | null
+          id: string
+          importance: number | null
+          last_mentioned: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          entity_type: string
+          frequency?: number | null
+          id?: string
+          importance?: number | null
+          last_mentioned?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          entity_type?: string
+          frequency?: number | null
+          id?: string
+          importance?: number | null
+          last_mentioned?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      knowledge_relationships: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          relationship_type: string
+          source_id: string
+          strength: number | null
+          target_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          relationship_type: string
+          source_id: string
+          strength?: number | null
+          target_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          relationship_type?: string
+          source_id?: string
+          strength?: number | null
+          target_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_relationships_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_relationships_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mood_logs: {
         Row: {
           context: Json | null

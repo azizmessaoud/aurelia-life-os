@@ -9,6 +9,7 @@ import DeepWork from "./pages/DeepWork";
 import Capacity from "./pages/Capacity";
 import Income from "./pages/Income";
 import Chat from "./pages/Chat";
+import KnowledgeGraph from "./pages/KnowledgeGraph";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/capacity" element={<Capacity />} />
           <Route path="/income" element={<Income />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/knowledge" element={<KnowledgeGraph />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
