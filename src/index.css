@@ -1,96 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* AURELIA Design System - Personal AI Life OS */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Light Mode - Clean & Focused */
+    --background: 220 20% 97%;
+    --foreground: 220 25% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 25% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 25% 10%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Electric Purple (Focus/AI) */
+    --primary: 265 85% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Cool Gray */
+    --secondary: 220 15% 92%;
+    --secondary-foreground: 220 25% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 15% 94%;
+    --muted-foreground: 220 10% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Vibrant Cyan (Energy/Action) */
+    --accent: 185 75% 45%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Success - Green */
+    --success: 145 65% 42%;
+    --success-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    /* Warning - Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 15%;
 
-    --sidebar-background: 0 0% 98%;
+    /* Energy levels */
+    --energy-high: 145 65% 42%;
+    --energy-medium: 38 92% 50%;
+    --energy-low: 0 75% 55%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* ADHD Compatibility colors */
+    --adhd-gold: 50 95% 55%;
+    --adhd-high: 145 65% 42%;
+    --adhd-medium: 38 92% 50%;
+    --adhd-low: 25 85% 55%;
+    --adhd-hell: 0 75% 55%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Dopamine levels */
+    --dopamine-obsession: 280 85% 60%;
+    --dopamine-interesting: 265 75% 55%;
+    --dopamine-neutral: 220 15% 50%;
+    --dopamine-low: 220 10% 65%;
+    --dopamine-boring: 220 5% 75%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    --border: 220 15% 88%;
+    --input: 220 15% 92%;
+    --ring: 265 85% 55%;
 
-    --sidebar-accent: 240 4.8% 95.9%;
+    --radius: 0.75rem;
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    /* Sidebar */
+    --sidebar-background: 220 20% 98%;
+    --sidebar-foreground: 220 25% 25%;
+    --sidebar-primary: 265 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 94%;
+    --sidebar-accent-foreground: 220 25% 20%;
+    --sidebar-border: 220 15% 90%;
+    --sidebar-ring: 265 85% 55%;
 
-    --sidebar-border: 220 13% 91%;
+    /* Chart colors */
+    --chart-1: 265 85% 55%;
+    --chart-2: 185 75% 45%;
+    --chart-3: 145 65% 42%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 0 75% 55%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Glass effects */
+    --glass-bg: 220 20% 97% / 0.8;
+    --glass-border: 220 15% 88% / 0.5;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark Mode - Deep Focus */
+    --background: 225 25% 8%;
+    --foreground: 220 15% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 225 25% 11%;
+    --card-foreground: 220 15% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 225 25% 11%;
+    --popover-foreground: 220 15% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Primary - Glowing Purple */
+    --primary: 270 80% 65%;
+    --primary-foreground: 225 25% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary - Slate */
+    --secondary: 220 20% 18%;
+    --secondary-foreground: 220 15% 85%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 20% 15%;
+    --muted-foreground: 220 10% 55%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent - Bright Cyan */
+    --accent: 185 85% 55%;
+    --accent-foreground: 225 25% 8%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --success: 145 70% 50%;
+    --success-foreground: 145 70% 10%;
+
+    --warning: 38 95% 55%;
+    --warning-foreground: 38 95% 10%;
+
+    /* Energy levels (dark) */
+    --energy-high: 145 70% 50%;
+    --energy-medium: 38 95% 55%;
+    --energy-low: 0 70% 50%;
+
+    /* ADHD Compatibility colors (dark) */
+    --adhd-gold: 50 95% 60%;
+    --adhd-high: 145 70% 50%;
+    --adhd-medium: 38 95% 55%;
+    --adhd-low: 25 85% 55%;
+    --adhd-hell: 0 70% 50%;
+
+    /* Dopamine levels (dark) */
+    --dopamine-obsession: 280 85% 65%;
+    --dopamine-interesting: 270 80% 60%;
+    --dopamine-neutral: 220 15% 50%;
+    --dopamine-low: 220 10% 40%;
+    --dopamine-boring: 220 5% 30%;
+
+    --border: 220 20% 20%;
+    --input: 220 20% 18%;
+    --ring: 270 80% 65%;
+
+    /* Sidebar (dark) */
+    --sidebar-background: 225 25% 6%;
+    --sidebar-foreground: 220 15% 85%;
+    --sidebar-primary: 270 80% 65%;
+    --sidebar-primary-foreground: 225 25% 8%;
+    --sidebar-accent: 220 20% 14%;
+    --sidebar-accent-foreground: 220 15% 85%;
+    --sidebar-border: 220 20% 16%;
+    --sidebar-ring: 270 80% 65%;
+
+    /* Chart colors (dark) */
+    --chart-1: 270 80% 65%;
+    --chart-2: 185 85% 55%;
+    --chart-3: 145 70% 50%;
+    --chart-4: 38 95% 55%;
+    --chart-5: 0 70% 50%;
+
+    /* Glass effects (dark) */
+    --glass-bg: 225 25% 8% / 0.85;
+    --glass-border: 220 20% 25% / 0.5;
   }
 }
 
@@ -100,6 +178,138 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/50 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full hover:bg-muted-foreground/50 transition-colors;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Glass morphism */
+  .glass {
+    @apply backdrop-blur-xl bg-card/80 border border-border/50;
+  }
+
+  /* Glow effects */
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3),
+                0 0 40px hsl(var(--primary) / 0.1);
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 20px hsl(var(--accent) / 0.3),
+                0 0 40px hsl(var(--accent) / 0.1);
+  }
+
+  .glow-success {
+    box-shadow: 0 0 20px hsl(var(--success) / 0.3),
+                0 0 40px hsl(var(--success) / 0.1);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  }
+
+  /* Gradient backgrounds */
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary/10 via-accent/5 to-transparent;
+  }
+
+  .gradient-card {
+    @apply bg-gradient-to-br from-card via-card to-muted/30;
+  }
+
+  /* Animated gradient border */
+  .gradient-border {
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+  }
+
+  .gradient-border:hover::before {
+    opacity: 1;
+  }
+
+  /* Shimmer animation */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Pulse glow */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 5px hsl(var(--primary) / 0.3);
+    }
+    50% { 
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.5),
+                  0 0 30px hsl(var(--primary) / 0.3);
+    }
+  }
+
+  /* Fade animations */
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
   }
 }
