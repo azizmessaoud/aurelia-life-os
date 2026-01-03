@@ -3,7 +3,7 @@ import {
   FolderKanban, 
   Timer, 
   TrendingUp, 
-  DollarSign, 
+  Search, 
   MessageSquare,
   Sparkles,
   Network
@@ -17,7 +17,7 @@ const navItems = [
   { icon: FolderKanban, label: "Projects", path: "/projects" },
   { icon: Timer, label: "Deep Work", path: "/deep-work" },
   { icon: TrendingUp, label: "Capacity", path: "/capacity" },
-  { icon: DollarSign, label: "Income Streams", path: "/income" },
+  { icon: Search, label: "Opportunities", path: "/opportunities" },
   { icon: Network, label: "Knowledge Graph", path: "/knowledge" },
   { icon: MessageSquare, label: "Chat with AURELIA", path: "/chat" },
 ];

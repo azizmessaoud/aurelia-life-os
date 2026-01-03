@@ -76,63 +76,6 @@ export type Database = {
           },
         ]
       }
-      income_streams: {
-        Row: {
-          adhd_compatibility: string
-          body_double_possible: boolean
-          context_switch_minutes: number
-          created_at: string
-          description: string | null
-          dopamine_level: string
-          has_external_deadline: boolean
-          id: string
-          last_worked_at: string | null
-          maintenance_energy: number
-          name: string
-          optimistic_monthly_eur: number | null
-          realistic_monthly_eur: number | null
-          setup_energy: number
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          adhd_compatibility?: string
-          body_double_possible?: boolean
-          context_switch_minutes?: number
-          created_at?: string
-          description?: string | null
-          dopamine_level?: string
-          has_external_deadline?: boolean
-          id?: string
-          last_worked_at?: string | null
-          maintenance_energy?: number
-          name: string
-          optimistic_monthly_eur?: number | null
-          realistic_monthly_eur?: number | null
-          setup_energy?: number
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          adhd_compatibility?: string
-          body_double_possible?: boolean
-          context_switch_minutes?: number
-          created_at?: string
-          description?: string | null
-          dopamine_level?: string
-          has_external_deadline?: boolean
-          id?: string
-          last_worked_at?: string | null
-          maintenance_energy?: number
-          name?: string
-          optimistic_monthly_eur?: number | null
-          realistic_monthly_eur?: number | null
-          setup_energy?: number
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       knowledge_entities: {
         Row: {
           color: string | null
@@ -256,6 +199,78 @@ export type Database = {
           stress?: number
           trigger?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      opportunities: {
+        Row: {
+          adhd_compatibility: string
+          application_deadline: string | null
+          body_double_possible: boolean
+          context_switch_minutes: number
+          created_at: string
+          description: string | null
+          dopamine_level: string
+          estimated_hours: number | null
+          has_external_deadline: boolean
+          id: string
+          last_worked_at: string | null
+          maintenance_energy: number
+          name: string
+          opportunity_type: string
+          optimistic_monthly_eur: number | null
+          realistic_monthly_eur: number | null
+          requirements: string | null
+          setup_energy: number
+          status: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          adhd_compatibility?: string
+          application_deadline?: string | null
+          body_double_possible?: boolean
+          context_switch_minutes?: number
+          created_at?: string
+          description?: string | null
+          dopamine_level?: string
+          estimated_hours?: number | null
+          has_external_deadline?: boolean
+          id?: string
+          last_worked_at?: string | null
+          maintenance_energy?: number
+          name: string
+          opportunity_type?: string
+          optimistic_monthly_eur?: number | null
+          realistic_monthly_eur?: number | null
+          requirements?: string | null
+          setup_energy?: number
+          status?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          adhd_compatibility?: string
+          application_deadline?: string | null
+          body_double_possible?: boolean
+          context_switch_minutes?: number
+          created_at?: string
+          description?: string | null
+          dopamine_level?: string
+          estimated_hours?: number | null
+          has_external_deadline?: boolean
+          id?: string
+          last_worked_at?: string | null
+          maintenance_energy?: number
+          name?: string
+          opportunity_type?: string
+          optimistic_monthly_eur?: number | null
+          realistic_monthly_eur?: number | null
+          requirements?: string | null
+          setup_energy?: number
+          status?: string
+          updated_at?: string
+          url?: string | null
         }
         Relationships: []
       }
