@@ -16,10 +16,13 @@ import { useActiveProjects } from "@/hooks/useProjects";
 import { useActiveSession, useTodaysDeepWorkMinutes, useWeeklyDeepWorkMinutes, useStartSession } from "@/hooks/useDeepWork";
 import { useCurrentWeekCapacity, useADHDTaxAverage } from "@/hooks/useWeeklyCapacity";
 import { useQuickWinStreams } from "@/hooks/useIncomeStreams";
+import { useAverageEnergy } from "@/hooks/useMoodLogs";
 import { Link } from "react-router-dom";
 import { format, differenceInDays, differenceInMinutes } from "date-fns";
 import { cn } from "@/lib/utils";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { MoodQuickLog } from "@/components/mood/MoodQuickLog";
+import { MoodTrendsCard } from "@/components/mood/MoodTrendsCard";
 
 function formatDuration(minutes: number): string {
   const hours = Math.floor(minutes / 60);
@@ -220,6 +223,7 @@ export default function Dashboard() {
   const { data: weeklyCapacity } = useCurrentWeekCapacity();
   const { data: adhdTaxAvg } = useADHDTaxAverage();
   const { data: projects = [] } = useActiveProjects();
+  const { data: avgEnergy } = useAverageEnergy(7);
   const startSession = useStartSession();
 
   const adhdTax = weeklyCapacity?.planned_hours && weeklyCapacity.planned_hours > 0
@@ -282,17 +286,23 @@ export default function Dashboard() {
 
         {/* Main Content Grid */}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Priority Project */}
+          {/* Left Column: Priority + Mood */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Target className="h-5 w-5 text-primary" />
               Today's Priority
             </h2>
             <PriorityProject />
+            
+            {/* Mood Quick Log */}
+            <MoodQuickLog />
           </div>
 
-          {/* Quick Wins */}
+          {/* Right Column: Energy Trends + Quick Wins */}
           <div className="space-y-4">
+            {/* Energy Trends */}
+            <MoodTrendsCard />
+            
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-success" />
               ADHD-Friendly Income
