@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Timer, Play, Square, Check, Clock, Zap } from "lucide-react";
+import { Timer, Play, Square, Check, Clock, Zap, Headphones, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -294,6 +294,35 @@ export default function DeepWorkPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Brain.fm Player */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Headphones className="h-4 w-4 text-primary" />
+                Brain.fm Focus Music
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1 text-xs"
+                onClick={() => window.open('https://my.brain.fm', '_blank')}
+              >
+                Open Full App
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <iframe
+              src="https://my.brain.fm"
+              className="w-full h-[400px] rounded-b-lg border-0"
+              allow="autoplay; encrypted-media"
+              title="Brain.fm"
+            />
+          </CardContent>
+        </Card>
 
         {/* Active Session or Start */}
         {activeSession ? <ActiveTimer /> : <StartSession />}
