@@ -133,6 +133,48 @@ export type Database = {
         }
         Relationships: []
       }
+      mood_logs: {
+        Row: {
+          context: Json | null
+          created_at: string
+          energy_level: number
+          id: string
+          location: string | null
+          logged_at: string
+          mood: number
+          notes: string | null
+          stress: number
+          trigger: string | null
+          updated_at: string
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string
+          energy_level: number
+          id?: string
+          location?: string | null
+          logged_at?: string
+          mood: number
+          notes?: string | null
+          stress: number
+          trigger?: string | null
+          updated_at?: string
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string
+          energy_level?: number
+          id?: string
+          location?: string | null
+          logged_at?: string
+          mood?: number
+          notes?: string | null
+          stress?: number
+          trigger?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           created_at: string
