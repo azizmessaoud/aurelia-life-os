@@ -31,6 +31,7 @@ function ActiveTimer() {
   const [showEndDialog, setShowEndDialog] = useState(false);
   const [focusQuality, setFocusQuality] = useState(7);
   const [notes, setNotes] = useState("");
+  const [showBrainFm, setShowBrainFm] = useState(true);
 
   useEffect(() => {
     if (session) {
@@ -59,7 +60,7 @@ function ActiveTimer() {
 
   return (
     <>
-      <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-accent/5 glow-primary">
+      <Card className="border-primary/50 bg-gradient-to-br from-primary/10 to-accent/5 glow-primary overflow-hidden">
         <CardContent className="p-8 text-center">
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="h-3 w-3 rounded-full bg-primary animate-pulse" />
@@ -84,6 +85,49 @@ function ActiveTimer() {
             End Session
           </Button>
         </CardContent>
+
+        {/* Brain.fm Section */}
+        <div className="border-t border-primary/20">
+          <button
+            onClick={() => setShowBrainFm(!showBrainFm)}
+            className="w-full flex items-center justify-between px-6 py-3 hover:bg-muted/50 transition-colors"
+          >
+            <span className="flex items-center gap-2 text-sm font-medium">
+              <Headphones className="h-4 w-4 text-primary" />
+              Brain.fm Focus Music
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1 text-xs h-7"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open('https://my.brain.fm', '_blank');
+                }}
+              >
+                Open Full App
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+              {showBrainFm ? (
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              )}
+            </div>
+          </button>
+          
+          {showBrainFm && (
+            <div className="px-0">
+              <iframe
+                src="https://my.brain.fm"
+                className="w-full h-[350px] border-0"
+                allow="autoplay; encrypted-media"
+                title="Brain.fm"
+              />
+            </div>
+          )}
+        </div>
       </Card>
 
       <Dialog open={showEndDialog} onOpenChange={setShowEndDialog}>
