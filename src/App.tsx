@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import DeepWork from "./pages/DeepWork";
 import Capacity from "./pages/Capacity";
-import Income from "./pages/Income";
+import Opportunities from "./pages/Opportunities";
 import Chat from "./pages/Chat";
 import KnowledgeGraph from "./pages/KnowledgeGraph";
 import NotFound from "./pages/NotFound";
@@ -25,7 +25,7 @@ const App = () => (
           <Route path="/projects" element={<Projects />} />
           <Route path="/deep-work" element={<DeepWork />} />
           <Route path="/capacity" element={<Capacity />} />
-          <Route path="/income" element={<Income />} />
+          <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/knowledge" element={<KnowledgeGraph />} />
           <Route path="*" element={<NotFound />} />

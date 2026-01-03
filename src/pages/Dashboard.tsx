@@ -15,7 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { useActiveProjects } from "@/hooks/useProjects";
 import { useActiveSession, useTodaysDeepWorkMinutes, useWeeklyDeepWorkMinutes, useStartSession } from "@/hooks/useDeepWork";
 import { useCurrentWeekCapacity, useADHDTaxAverage } from "@/hooks/useWeeklyCapacity";
-import { useQuickWinStreams } from "@/hooks/useIncomeStreams";
+import { useQuickWinOpportunities } from "@/hooks/useOpportunities";
 import { useAverageEnergy } from "@/hooks/useMoodLogs";
 import { Link } from "react-router-dom";
 import { format, differenceInDays, differenceInMinutes } from "date-fns";
@@ -171,7 +171,7 @@ function PriorityProject() {
 }
 
 function QuickWins() {
-  const { data: streams } = useQuickWinStreams();
+  const { data: streams } = useQuickWinOpportunities();
 
   if (!streams || streams.length === 0) {
     return null;

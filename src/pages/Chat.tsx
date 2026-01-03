@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useChatMessages, useStreamingChat, useClearChat } from "@/hooks/useChat";
 import { useActiveProjects } from "@/hooks/useProjects";
-import { useActiveIncomeStreams } from "@/hooks/useIncomeStreams";
+import { useActiveOpportunities } from "@/hooks/useOpportunities";
 import { useCurrentWeekCapacity } from "@/hooks/useWeeklyCapacity";
 import { useTodaysDeepWorkMinutes, useDeepWorkSessions } from "@/hooks/useDeepWork";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -54,7 +54,7 @@ const suggestedPrompts = [
 export default function ChatPage() {
   const { data: messages = [], isLoading: messagesLoading } = useChatMessages();
   const { data: projects = [] } = useActiveProjects();
-  const { data: incomeStreams = [] } = useActiveIncomeStreams();
+  const { data: incomeStreams = [] } = useActiveOpportunities("income");
   const { data: weeklyCapacity } = useCurrentWeekCapacity();
   const { data: todayMinutes = 0 } = useTodaysDeepWorkMinutes();
   const { data: recentSessions = [] } = useDeepWorkSessions();
