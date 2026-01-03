@@ -148,10 +148,10 @@ function ActiveTimer() {
 function StartSession() {
   const startSession = useStartSession();
   const { data: projects = [] } = useActiveProjects();
-  const [selectedProject, setSelectedProject] = useState<string>("");
+  const [selectedProject, setSelectedProject] = useState<string>("none");
 
   const handleStart = () => {
-    startSession.mutate(selectedProject || undefined);
+    startSession.mutate(selectedProject === "none" ? undefined : selectedProject);
   };
 
   return (
@@ -167,7 +167,7 @@ function StartSession() {
               <SelectValue placeholder="Select a project (optional)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No project</SelectItem>
+              <SelectItem value="none">No project</SelectItem>
               {projects.map((p) => (
                 <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
               ))}
