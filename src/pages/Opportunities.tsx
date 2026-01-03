@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, DollarSign, GraduationCap, Heart, Award, Zap, Clock, Brain, Trash2, Edit2, ExternalLink, Calendar } from "lucide-react";
+import { Plus, Search, DollarSign, GraduationCap, Heart, Award, Zap, Clock, Brain, Trash2, Edit2, ExternalLink, Calendar, Sparkles, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,8 @@ import { useOpportunities, useCreateOpportunity, useUpdateOpportunity, useDelete
 import { AppLayout } from "@/components/layout/AppLayout";
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow, isPast, isWithinInterval, addDays } from "date-fns";
-
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 const opportunityTypes: { value: OpportunityType; label: string; icon: React.ElementType; color: string }[] = [
   { value: "income", label: "Income", icon: DollarSign, color: "bg-success/20 text-success border-success/30" },
   { value: "scholarship", label: "Scholarship", icon: GraduationCap, color: "bg-primary/20 text-primary border-primary/30" },
@@ -419,6 +420,13 @@ export default function OpportunitiesPage() {
   const deleteOpportunity = useDeleteOpportunity();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState<Opportunity | null>(null);
+  
+  // AI Discovery state
+  const [discoveryOpen, setDiscoveryOpen] = useState(false);
+  const [discoveryType, setDiscoveryType] = useState<"scholarship" | "certification" | "volunteering">("scholarship");
+  const [isDiscovering, setIsDiscovering] = useState(false);
+  const [discoveredOpportunities, setDiscoveredOpportunities] = useState<any[]>([]);
+  const [citations, setCitations] = useState<string[]>([]);
 
   const activeOpportunities = opportunities.filter((o) => o.status === "active");
   const quickWins = activeOpportunities.filter((o) => 
@@ -432,6 +440,61 @@ export default function OpportunitiesPage() {
   const incomeOpportunities = activeOpportunities.filter((o) => o.opportunity_type === "income");
   const totalRealistic = incomeOpportunities.reduce((sum, o) => sum + (o.realistic_monthly_eur || 0), 0);
   const totalOptimistic = incomeOpportunities.reduce((sum, o) => sum + (o.optimistic_monthly_eur || 0), 0);
+
+  const handleDiscover = async () => {
+    setIsDiscovering(true);
+    setDiscoveredOpportunities([]);
+    setCitations([]);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('discover-opportunities', {
+        body: { type: discoveryType, profile: { field: 'Data Science', level: 'Masters' } }
+      });
+      
+      if (error) throw error;
+      
+      setDiscoveredOpportunities(data.opportunities || []);
+      setCitations(data.citations || []);
+      
+      if (data.opportunities?.length === 0) {
+        toast.info("No new opportunities found. Try a different type.");
+      } else {
+        toast.success(`Found ${data.opportunities.length} opportunities!`);
+      }
+    } catch (err) {
+      console.error('Discovery error:', err);
+      toast.error("Failed to discover opportunities");
+    } finally {
+      setIsDiscovering(false);
+    }
+  };
+
+  const handleAddDiscovered = async (discovered: any) => {
+    const newOpp: NewOpportunity = {
+      name: discovered.name,
+      description: discovered.description,
+      opportunity_type: discoveryType,
+      adhd_compatibility: discovered.adhd_compatibility || "medium",
+      dopamine_level: "interesting",
+      context_switch_minutes: 15,
+      setup_energy: 5,
+      maintenance_energy: 5,
+      realistic_monthly_eur: null,
+      optimistic_monthly_eur: null,
+      has_external_deadline: !!discovered.deadline,
+      body_double_possible: false,
+      status: "active",
+      last_worked_at: null,
+      application_deadline: discovered.deadline ? new Date(discovered.deadline).toISOString() : null,
+      requirements: discovered.requirements,
+      url: discovered.url,
+      estimated_hours: discovered.estimated_hours,
+    };
+    
+    await createOpportunity.mutateAsync(newOpp);
+    setDiscoveredOpportunities(prev => prev.filter(o => o.name !== discovered.name));
+  };
+
 
   const handleSubmit = async (data: NewOpportunity) => {
     if (editingOpportunity) {
@@ -469,25 +532,184 @@ export default function OpportunitiesPage() {
             </p>
           </div>
 
-          <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) setEditingOpportunity(null); }}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Opportunity
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>{editingOpportunity ? "Edit" : "Add"} Opportunity</DialogTitle>
-              </DialogHeader>
-              <OpportunityForm
-                opportunity={editingOpportunity || undefined}
-                onSubmit={handleSubmit}
-                onCancel={() => { setDialogOpen(false); setEditingOpportunity(null); }}
-                isLoading={createOpportunity.isPending || updateOpportunity.isPending}
-              />
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-2">
+            <Dialog open={discoveryOpen} onOpenChange={setDiscoveryOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2 border-primary/50 hover:bg-primary/10">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  AI Discover
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    AI Opportunity Discovery
+                  </DialogTitle>
+                </DialogHeader>
+                
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <Select value={discoveryType} onValueChange={(v) => setDiscoveryType(v as any)}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="scholarship">
+                          <div className="flex items-center gap-2">
+                            <GraduationCap className="h-4 w-4" />
+                            Scholarships
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="certification">
+                          <div className="flex items-center gap-2">
+                            <Award className="h-4 w-4" />
+                            Certifications
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="volunteering">
+                          <div className="flex items-center gap-2">
+                            <Heart className="h-4 w-4" />
+                            Volunteering
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Button onClick={handleDiscover} disabled={isDiscovering}>
+                      {isDiscovering ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Searching...
+                        </>
+                      ) : (
+                        <>
+                          <Search className="h-4 w-4 mr-2" />
+                          Search Web
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground">
+                    Searches the web for opportunities matching your profile as a Data Science student.
+                  </p>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto mt-4 space-y-3">
+                  {discoveredOpportunities.length === 0 && !isDiscovering && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Sparkles className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                      <p>Click "Search Web" to discover opportunities</p>
+                    </div>
+                  )}
+                  
+                  {discoveredOpportunities.map((opp, idx) => (
+                    <Card key={idx} className="relative">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-semibold">{opp.name}</h4>
+                              {opp.adhd_compatibility && (
+                                <Badge variant="outline" className={cn(
+                                  "text-xs",
+                                  opp.adhd_compatibility === "high" && "bg-adhd-high/20 text-adhd-high border-adhd-high/30"
+                                )}>
+                                  {opp.adhd_compatibility} ADHD fit
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-2">{opp.description}</p>
+                            
+                            <div className="flex flex-wrap gap-2 text-xs">
+                              {opp.deadline && (
+                                <Badge variant="secondary">
+                                  <Calendar className="h-3 w-3 mr-1" />
+                                  {opp.deadline}
+                                </Badge>
+                              )}
+                              {opp.estimated_hours && (
+                                <Badge variant="secondary">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  {opp.estimated_hours}h
+                                </Badge>
+                              )}
+                              {opp.url && (
+                                <a 
+                                  href={opp.url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline flex items-center gap-1"
+                                >
+                                  <ExternalLink className="h-3 w-3" />
+                                  View
+                                </a>
+                              )}
+                            </div>
+                            
+                            {opp.requirements && (
+                              <p className="text-xs text-muted-foreground mt-2">
+                                <strong>Requirements:</strong> {opp.requirements}
+                              </p>
+                            )}
+                          </div>
+                          
+                          <Button 
+                            size="sm" 
+                            onClick={() => handleAddDiscovered(opp)}
+                            disabled={createOpportunity.isPending}
+                          >
+                            <Plus className="h-4 w-4 mr-1" />
+                            Add
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                
+                {citations.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <p className="text-xs text-muted-foreground mb-2">Sources:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {citations.slice(0, 5).map((url, idx) => (
+                        <a 
+                          key={idx}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:underline truncate max-w-[200px]"
+                        >
+                          {new URL(url).hostname}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
+            
+            <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) setEditingOpportunity(null); }}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Opportunity
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>{editingOpportunity ? "Edit" : "Add"} Opportunity</DialogTitle>
+                </DialogHeader>
+                <OpportunityForm
+                  opportunity={editingOpportunity || undefined}
+                  onSubmit={handleSubmit}
+                  onCancel={() => { setDialogOpen(false); setEditingOpportunity(null); }}
+                  isLoading={createOpportunity.isPending || updateOpportunity.isPending}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Type Filter */}

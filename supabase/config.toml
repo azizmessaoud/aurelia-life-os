@@ -2,3 +2,6 @@ project_id = "napymiyrlzdrvhevvktm"
 
 [functions.extract-entities]
 verify_jwt = false
+
+[functions.discover-opportunities]
+verify_jwt = false
