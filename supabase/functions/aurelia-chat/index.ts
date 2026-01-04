@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,8 +13,20 @@ You are NOT a generic assistant. You are a council of specialized agents working
 - **Planner Agent**: Creates realistic daily plans (max 3 MITs)
 - **Critic Agent**: Challenges plans, flags burnout risks, calls out avoidance
 - **Opportunity Agent**: Evaluates income streams for ADHD compatibility
-- **Memory Agent**: Remembers patterns from past data
+- **Memory Agent**: Remembers patterns from past data AND the knowledge graph
 - **Executor Agent**: Breaks tasks into next actions with timers
+
+## KNOWLEDGE GRAPH INTEGRATION
+You have access to a personal knowledge graph containing:
+- **Entities**: Projects, blockers, emotions, patterns, wins, skills, people, tools, habits
+- **Relationships**: BLOCKS, TRIGGERS, ENABLES, REQUIRES, CAUSED_BY, HELPS_WITH, RELATES_TO
+
+When the graph context is provided:
+1. Reference specific entities by name when giving advice
+2. Trace causal chains (e.g., "Procrastination BLOCKS AWS Cert, and Overwhelm TRIGGERS Procrastination")
+3. Identify root causes, not just symptoms
+4. Suggest breaking cycles based on graph structure
+5. Highlight high-importance (⭐) and high-frequency entities as key patterns
 
 ## CORE PHILOSOPHY: REVERSE GOAL SETTING
 The real goal is NOT the trophy (exam, income, body) but how you want your life to FEEL and the POSITION it puts you in for future goals.
@@ -72,9 +85,37 @@ When you sense overwhelm, frustration, or avoidance:
 - When giving a plan, limit to 3-5 items MAX.
 
 ## WHEN GIVEN DATA
-Use the provided context (projects, income streams, capacity, deep work minutes) to give PERSONALIZED advice. Reference specific projects by name. Compare patterns across weeks. Be specific, not generic.
+Use the provided context (projects, income streams, capacity, deep work minutes, AND knowledge graph) to give PERSONALIZED advice. Reference specific projects by name. Compare patterns across weeks. Use the graph to identify root causes and connections. Be specific, not generic.
 
 Remember: You're not managing projects. You're helping Aziz manage HIMSELF - a person with ADHD trying to build a sustainable, calm, financially independent life.`;
+
+// Call the GraphRAG query function to get knowledge graph context
+async function getGraphContext(question: string, supabaseUrl: string, serviceKey: string): Promise<string> {
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/graphrag-query`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({
+        question,
+        include_high_importance: true,
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn("GraphRAG query failed:", response.status);
+      return "";
+    }
+
+    const data = await response.json();
+    return data.context || "";
+  } catch (error) {
+    console.warn("GraphRAG error:", error);
+    return "";
+  }
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -84,10 +125,22 @@ serve(async (req) => {
   try {
     const { message, context, conversationHistory } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
     if (!LOVABLE_API_KEY) {
       console.error("LOVABLE_API_KEY is not configured");
       throw new Error("AI service not configured");
+    }
+
+    // Fetch GraphRAG context (knowledge graph retrieval)
+    console.log("Fetching GraphRAG context for:", message.slice(0, 100));
+    const graphContext = await getGraphContext(message, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    
+    if (graphContext) {
+      console.log("GraphRAG context retrieved:", graphContext.length, "chars");
+    } else {
+      console.log("No GraphRAG context available");
     }
 
     // Build comprehensive context summary
@@ -165,8 +218,17 @@ serve(async (req) => {
       }
     }
 
-    const userMessageWithContext = contextSummary
-      ? `${message}\n\n[CURRENT SYSTEM STATE]${contextSummary}`
+    // Combine all context: GraphRAG + System State
+    let fullContext = "";
+    if (graphContext) {
+      fullContext += `\n\n${graphContext}`;
+    }
+    if (contextSummary) {
+      fullContext += `\n\n[CURRENT SYSTEM STATE]${contextSummary}`;
+    }
+
+    const userMessageWithContext = fullContext
+      ? `${message}${fullContext}`
       : message;
 
     // Build messages array with conversation history
@@ -184,7 +246,7 @@ serve(async (req) => {
 
     messages.push({ role: "user", content: userMessageWithContext });
 
-    console.log("Sending message to AI gateway with enhanced context");
+    console.log("Sending message to AI gateway with GraphRAG + system context");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

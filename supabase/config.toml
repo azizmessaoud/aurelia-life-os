@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.detect-patterns]
 verify_jwt = false
+
+[functions.graphrag-query]
+verify_jwt = false
