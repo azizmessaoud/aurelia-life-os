@@ -71,22 +71,40 @@ Format: Start with health observation, then sustainable recommendations.`
 
 Respond with a concise analysis (2-3 sentences) on opportunities.
 Format: Start with the opportunity, then how to capture it.`
+  },
+  STUDY: {
+    name: "Study",
+    emoji: "📚",
+    systemPrompt: `You are the STUDY agent in an ADHD-aware life coaching council. Your role is to:
+- Optimize learning sessions for ADHD brains (spaced repetition, active recall)
+- Track academic progress and upcoming deadlines
+- Suggest study techniques: Feynman, Pomodoro, active recall
+- Flag exam deadlines and suggest study sprints
+- Balance deep conceptual learning vs practical application
+- Connect coursework to real-world projects
+
+Context: User is a 4th-year Data Science student.
+
+Respond with a concise analysis (2-3 sentences) on academic/learning strategy.
+Format: Start with academic priority, then actionable study recommendations.`
   }
 };
 
 // Orchestrator that synthesizes agent responses
 const ORCHESTRATOR_PROMPT = `You are the ORCHESTRATOR of an ADHD-aware AI life coaching council. 
-You've just received perspectives from 5 specialized agents:
+You've just received perspectives from 6 specialized agents:
 - PLANNER: Creates actionable plans
 - CRITIC: Identifies risks and guardrails
 - MEMORY: Connects patterns from the past
 - HEALTH: Monitors wellbeing and sustainability
 - OPPORTUNITY: Spots growth opportunities
+- STUDY: Optimizes academic learning and deadlines
 
 Your job is to SYNTHESIZE their insights into a cohesive, actionable recommendation for the user.
 
 Guidelines:
 - Weigh all perspectives, but prioritize Health if burnout risk is high
+- Give extra weight to STUDY agent when academic deadlines are imminent
 - Create a balanced response that acknowledges tradeoffs
 - Be direct and conversational, not clinical
 - Include 1-3 concrete next steps
@@ -109,6 +127,14 @@ async function callAgent(
   context: any,
   apiKey: string
 ): Promise<{ agent: string; name: string; emoji: string; response: string }> {
+  const academicContext = context.academicContext ? `
+ACADEMIC CONTEXT:
+- Upcoming deadlines: ${context.academicContext.upcomingDeadlines?.length || 0} assignments due soon
+- Classes this week: ${context.academicContext.thisWeekClasses?.length || 0} scheduled sessions
+- Active courses: ${context.academicContext.activeCourses || 0}
+${context.academicContext.upcomingDeadlines?.slice(0, 3).map((d: any) => `  • ${d.title} (due ${d.due_date})`).join('\n') || ''}
+` : '';
+
   const contextSummary = `
 Current context:
 - Projects: ${context.projects?.length || 0} active
@@ -117,7 +143,7 @@ Current context:
 - This week: ${context.weeklyCapacity?.actual_hours || 0}/${context.weeklyCapacity?.planned_hours || 0} hours
 ${context.recentMood ? `- Recent mood: ${context.recentMood}/10` : ''}
 ${context.recentEnergy ? `- Recent energy: ${context.recentEnergy}/10` : ''}
-`;
+${academicContext}`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",

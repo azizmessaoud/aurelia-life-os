@@ -22,7 +22,8 @@ import {
   Search,
   Brain,
   Heart,
-  Target
+  Target,
+  GraduationCap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ const AGENT_ICONS: Record<AgentType, React.ElementType> = {
   MEMORY: Brain,
   HEALTH: Heart,
   OPPORTUNITY: Target,
+  STUDY: GraduationCap,
 };
 
 interface AgentCardProps {
@@ -296,6 +298,11 @@ export function AgentCouncilView({ context, className }: AgentCouncilViewProps) 
         {context.weeklyCapacity && (
           <Badge variant="outline">
             📊 {context.weeklyCapacity.actual_hours}/{context.weeklyCapacity.planned_hours}h week
+          </Badge>
+        )}
+        {context.academicContext && (
+          <Badge variant="outline">
+            📚 {context.academicContext.upcomingDeadlines?.length || 0} deadlines
           </Badge>
         )}
       </div>

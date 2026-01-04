@@ -5,6 +5,7 @@ import { useActiveOpportunities } from "@/hooks/useOpportunities";
 import { useCurrentWeekCapacity } from "@/hooks/useWeeklyCapacity";
 import { useTodaysDeepWorkMinutes, useDeepWorkSessions } from "@/hooks/useDeepWork";
 import { useRecentMoodLogs } from "@/hooks/useMoodLogs";
+import { useUpcomingAssignments, useTodaySchedule, useAcademicCourses } from "@/hooks/useAcademic";
 
 export default function CouncilPage() {
   const { data: projects = [] } = useActiveProjects();
@@ -13,6 +14,11 @@ export default function CouncilPage() {
   const { data: todayMinutes = 0 } = useTodaysDeepWorkMinutes();
   const { data: recentSessions = [] } = useDeepWorkSessions();
   const { data: moodLogs = [] } = useRecentMoodLogs(7);
+  
+  // Academic context
+  const { data: upcomingDeadlines = [] } = useUpcomingAssignments(14);
+  const { data: todayClasses = [] } = useTodaySchedule();
+  const { data: courses = [] } = useAcademicCourses();
 
   // Get most recent mood/energy
   const latestMood = moodLogs[0];
@@ -25,6 +31,11 @@ export default function CouncilPage() {
     recentSessions: recentSessions.slice(0, 10),
     recentMood: latestMood?.mood,
     recentEnergy: latestMood?.energy_level,
+    academicContext: {
+      upcomingDeadlines,
+      thisWeekClasses: todayClasses,
+      activeCourses: courses.length,
+    },
   };
 
   return (

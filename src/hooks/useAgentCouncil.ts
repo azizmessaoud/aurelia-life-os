@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 
-export type AgentType = "PLANNER" | "CRITIC" | "MEMORY" | "HEALTH" | "OPPORTUNITY";
+export type AgentType = "PLANNER" | "CRITIC" | "MEMORY" | "HEALTH" | "OPPORTUNITY" | "STUDY";
 
 export interface AgentResponse {
   agent: AgentType;
@@ -15,6 +15,12 @@ export interface CouncilResult {
   timestamp: string;
 }
 
+export interface AcademicContext {
+  upcomingDeadlines: any[];
+  thisWeekClasses: any[];
+  activeCourses: number;
+}
+
 export interface CouncilContext {
   projects?: any[];
   incomeStreams?: any[];
@@ -23,6 +29,7 @@ export interface CouncilContext {
   recentMood?: number;
   recentEnergy?: number;
   recentSessions?: any[];
+  academicContext?: AcademicContext;
 }
 
 export const AGENT_INFO: Record<AgentType, { name: string; emoji: string; description: string; color: string }> = {
@@ -55,6 +62,12 @@ export const AGENT_INFO: Record<AgentType, { name: string; emoji: string; descri
     emoji: "🎯",
     description: "Spots growth opportunities",
     color: "#F59E0B" // Amber
+  },
+  STUDY: {
+    name: "Study",
+    emoji: "📚",
+    description: "Optimizes learning and academic progress",
+    color: "#EC4899" // Pink
   }
 };
 
