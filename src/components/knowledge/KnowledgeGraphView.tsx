@@ -36,6 +36,20 @@ const ENTITY_ICONS: Record<EntityType, LucideIcon> = {
   habit: Repeat,
 };
 
+// Color mapping for relationship types
+const RELATIONSHIP_COLORS: Record<string, string> = {
+  BLOCKS: '#EF4444',        // Red - negative/blocking
+  CONFLICTS_WITH: '#F97316', // Orange - conflict
+  TRIGGERS: '#F59E0B',       // Amber - causal trigger
+  REQUIRES: '#8B5CF6',       // Purple - dependency
+  LEADS_TO: '#06B6D4',       // Cyan - consequence
+  ENABLES: '#10B981',        // Green - positive/enabling
+  IMPROVES: '#22C55E',       // Light green - enhancement
+  USES: '#3B82F6',           // Blue - utilization
+  PART_OF: '#6366F1',        // Indigo - composition
+  RELATED_TO: '#94A3B8',     // Slate - generic relation
+};
+
 interface NodePosition {
   x: number;
   y: number;
@@ -245,6 +259,17 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
             const target = positions[rel.target_id];
             if (!source || !target) return null;
 
+            const edgeColor = RELATIONSHIP_COLORS[rel.relationship_type] || '#94A3B8';
+            const label = RELATIONSHIP_LABELS[rel.relationship_type] || rel.relationship_type;
+            
+            // Calculate midpoint for label
+            const midX = (source.x + target.x) / 2;
+            const midY = (source.y + target.y) / 2;
+            
+            // Calculate angle for label rotation
+            const angle = Math.atan2(target.y - source.y, target.x - source.x) * (180 / Math.PI);
+            const adjustedAngle = angle > 90 || angle < -90 ? angle + 180 : angle;
+
             return (
               <g key={rel.id}>
                 <line
@@ -252,31 +277,58 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
                   y1={source.y}
                   x2={target.x}
                   y2={target.y}
-                  stroke="hsl(var(--muted-foreground))"
-                  strokeWidth={Math.max(1, rel.strength / 3)}
-                  strokeOpacity={0.4}
-                  markerEnd="url(#arrowhead)"
+                  stroke={edgeColor}
+                  strokeWidth={Math.max(1.5, rel.strength / 2.5)}
+                  strokeOpacity={0.6}
+                  markerEnd={`url(#arrowhead-${rel.relationship_type})`}
                 />
+                {/* Edge label */}
+                <g transform={`translate(${midX}, ${midY})`}>
+                  <rect
+                    x={-label.length * 3.2}
+                    y={-8}
+                    width={label.length * 6.4}
+                    height={14}
+                    rx={3}
+                    fill="hsl(var(--background))"
+                    fillOpacity={0.9}
+                    stroke={edgeColor}
+                    strokeWidth={1}
+                    strokeOpacity={0.5}
+                  />
+                  <text
+                    textAnchor="middle"
+                    dy={3}
+                    fontSize={9}
+                    fontWeight={500}
+                    fill={edgeColor}
+                  >
+                    {label}
+                  </text>
+                </g>
               </g>
             );
           })}
 
-          {/* Arrow marker */}
+          {/* Arrow markers for each relationship type */}
           <defs>
-            <marker
-              id="arrowhead"
-              markerWidth="6"
-              markerHeight="6"
-              refX="5"
-              refY="3"
-              orient="auto"
-            >
-              <polygon
-                points="0 0, 6 3, 0 6"
-                fill="hsl(var(--muted-foreground))"
-                fillOpacity={0.4}
-              />
-            </marker>
+            {Object.entries(RELATIONSHIP_COLORS).map(([type, color]) => (
+              <marker
+                key={type}
+                id={`arrowhead-${type}`}
+                markerWidth="8"
+                markerHeight="8"
+                refX="6"
+                refY="4"
+                orient="auto"
+              >
+                <polygon
+                  points="0 0, 8 4, 0 8"
+                  fill={color}
+                  fillOpacity={0.8}
+                />
+              </marker>
+            ))}
           </defs>
 
           {/* Nodes */}
