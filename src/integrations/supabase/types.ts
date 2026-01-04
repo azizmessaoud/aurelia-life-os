@@ -282,6 +282,7 @@ export type Database = {
           graph_context: Json | null
           id: string
           role: string
+          user_id: string | null
         }
         Insert: {
           content: string
@@ -289,6 +290,7 @@ export type Database = {
           graph_context?: Json | null
           id?: string
           role: string
+          user_id?: string | null
         }
         Update: {
           content?: string
@@ -296,6 +298,7 @@ export type Database = {
           graph_context?: Json | null
           id?: string
           role?: string
+          user_id?: string | null
         }
         Relationships: []
       }
