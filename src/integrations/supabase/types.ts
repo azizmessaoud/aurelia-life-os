@@ -35,6 +35,45 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_logs: {
+        Row: {
+          created_at: string
+          deep_work_minutes: number | null
+          hours_coded: number | null
+          id: string
+          log_date: string
+          notes: string | null
+          revenue_earned: number | null
+          tasks_completed: number | null
+          updated_at: string
+          workouts_done: number | null
+        }
+        Insert: {
+          created_at?: string
+          deep_work_minutes?: number | null
+          hours_coded?: number | null
+          id?: string
+          log_date?: string
+          notes?: string | null
+          revenue_earned?: number | null
+          tasks_completed?: number | null
+          updated_at?: string
+          workouts_done?: number | null
+        }
+        Update: {
+          created_at?: string
+          deep_work_minutes?: number | null
+          hours_coded?: number | null
+          id?: string
+          log_date?: string
+          notes?: string | null
+          revenue_earned?: number | null
+          tasks_completed?: number | null
+          updated_at?: string
+          workouts_done?: number | null
+        }
+        Relationships: []
+      }
       deep_work_sessions: {
         Row: {
           created_at: string
@@ -75,6 +114,101 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      goal_force_fields: {
+        Row: {
+          counter_move: string | null
+          created_at: string
+          description: string
+          force_type: string
+          goal_id: string
+          id: string
+          is_addressed: boolean
+          strength: number
+          updated_at: string
+        }
+        Insert: {
+          counter_move?: string | null
+          created_at?: string
+          description: string
+          force_type: string
+          goal_id: string
+          id?: string
+          is_addressed?: boolean
+          strength?: number
+          updated_at?: string
+        }
+        Update: {
+          counter_move?: string | null
+          created_at?: string
+          description?: string
+          force_type?: string
+          goal_id?: string
+          id?: string
+          is_addressed?: boolean
+          strength?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_force_fields_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      goals: {
+        Row: {
+          anti_goals: string | null
+          area: string
+          created_at: string
+          current_value: number | null
+          deadline: string | null
+          gps_status: string
+          id: string
+          metric_name: string | null
+          priority: number
+          target_value: number | null
+          timeframe: string
+          title: string
+          updated_at: string
+          why_driver: string | null
+        }
+        Insert: {
+          anti_goals?: string | null
+          area?: string
+          created_at?: string
+          current_value?: number | null
+          deadline?: string | null
+          gps_status?: string
+          id?: string
+          metric_name?: string | null
+          priority?: number
+          target_value?: number | null
+          timeframe?: string
+          title: string
+          updated_at?: string
+          why_driver?: string | null
+        }
+        Update: {
+          anti_goals?: string | null
+          area?: string
+          created_at?: string
+          current_value?: number | null
+          deadline?: string | null
+          gps_status?: string
+          id?: string
+          metric_name?: string | null
+          priority?: number
+          target_value?: number | null
+          timeframe?: string
+          title?: string
+          updated_at?: string
+          why_driver?: string | null
+        }
+        Relationships: []
       }
       knowledge_entities: {
         Row: {
@@ -156,6 +290,47 @@ export type Database = {
             columns: ["target_id"]
             isOneToOne: false
             referencedRelation: "knowledge_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_goals: {
+        Row: {
+          created_at: string
+          current_level: number
+          goal_id: string
+          id: string
+          practice_system: string | null
+          required_level: number
+          skill_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_level?: number
+          goal_id: string
+          id?: string
+          practice_system?: string | null
+          required_level?: number
+          skill_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_level?: number
+          goal_id?: string
+          id?: string
+          practice_system?: string | null
+          required_level?: number
+          skill_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_goals_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
             referencedColumns: ["id"]
           },
         ]
@@ -280,6 +455,7 @@ export type Database = {
           deadline: string | null
           description: string | null
           domain: string
+          goal_id: string | null
           id: string
           priority: number
           progress: number
@@ -292,6 +468,7 @@ export type Database = {
           deadline?: string | null
           description?: string | null
           domain?: string
+          goal_id?: string | null
           id?: string
           priority?: number
           progress?: number
@@ -304,6 +481,7 @@ export type Database = {
           deadline?: string | null
           description?: string | null
           domain?: string
+          goal_id?: string | null
           id?: string
           priority?: number
           progress?: number
@@ -311,7 +489,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "projects_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       weekly_capacity: {
         Row: {

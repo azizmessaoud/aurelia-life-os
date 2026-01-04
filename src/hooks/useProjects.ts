@@ -11,6 +11,7 @@ export type Project = {
   priority: number;
   status: string;
   progress: number;
+  goal_id: string | null;
   created_at: string;
   updated_at: string;
 };

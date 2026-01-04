@@ -7,7 +7,9 @@ import {
   MessageSquare,
   Sparkles,
   Network,
-  Users
+  Users,
+  Compass,
+  Target
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -15,6 +17,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Compass, label: "Life GPS", path: "/gps" },
+  { icon: Target, label: "Goals", path: "/goals" },
   { icon: FolderKanban, label: "Projects", path: "/projects" },
   { icon: Timer, label: "Deep Work", path: "/deep-work" },
   { icon: TrendingUp, label: "Capacity", path: "/capacity" },

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Calendar, Trash2, Edit2, Check, X, FolderKanban } from "lucide-react";
+import { Plus, Calendar, Trash2, Edit2, Check, X, FolderKanban, Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useProjects, useCreateProject, useUpdateProject, useDeleteProject, type Project, type NewProject } from "@/hooks/useProjects";
+import { useGoals, GOAL_AREAS } from "@/hooks/useGoals";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -40,6 +41,8 @@ function ProjectForm({
   onCancel: () => void;
   isLoading: boolean;
 }) {
+  const { data: goals = [] } = useGoals();
+  
   const [formData, setFormData] = useState<NewProject>({
     title: project?.title || "",
     description: project?.description || "",
@@ -48,6 +51,7 @@ function ProjectForm({
     priority: project?.priority || 3,
     status: project?.status || "active",
     progress: project?.progress || 0,
+    goal_id: project?.goal_id || null,
   });
 
   return (
@@ -71,6 +75,33 @@ function ProjectForm({
           className="mt-1"
           rows={3}
         />
+      </div>
+
+      {/* Link to Goal */}
+      <div>
+        <label className="text-sm font-medium flex items-center gap-2">
+          <Target className="h-3.5 w-3.5" />
+          Link to Goal
+        </label>
+        <Select 
+          value={formData.goal_id || "none"} 
+          onValueChange={(v) => setFormData({ ...formData, goal_id: v === "none" ? null : v })}
+        >
+          <SelectTrigger className="mt-1">
+            <SelectValue placeholder="Select a goal..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">No goal linked</SelectItem>
+            {goals.map((goal) => {
+              const area = GOAL_AREAS.find(a => a.value === goal.area);
+              return (
+                <SelectItem key={goal.id} value={goal.id}>
+                  {area?.emoji} {goal.title}
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
