@@ -1,3 +1,5 @@
+import { authenticateRequest, unauthorizedResponse, validateUrl } from "../_shared/auth.ts";
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -8,12 +10,18 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Authenticate request
+  const { user, error: authError } = await authenticateRequest(req);
+  if (authError || !user) {
+    return unauthorizedResponse(authError || "Unauthorized", corsHeaders);
+  }
+
   try {
     const { url, options } = await req.json();
 
-    if (!url) {
+    if (!url || !validateUrl(url)) {
       return new Response(
-        JSON.stringify({ success: false, error: 'URL is required' }),
+        JSON.stringify({ success: false, error: 'Valid URL is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { authenticateRequest, unauthorizedResponse, validateString, sanitizeForIlike } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -34,8 +35,24 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Authenticate request
+  const { user, error: authError } = await authenticateRequest(req);
+  if (authError || !user) {
+    return unauthorizedResponse(authError || "Unauthorized", corsHeaders);
+  }
+
   try {
-    const { user_message, assistant_message } = await req.json();
+    const body = await req.json();
+    const user_message = validateString(body.user_message, 10000);
+    const assistant_message = validateString(body.assistant_message, 20000);
+    
+    if (!user_message || !assistant_message) {
+      return new Response(
+        JSON.stringify({ error: "Invalid or missing messages" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;

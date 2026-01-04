@@ -28,6 +28,7 @@ export type Database = {
           submission_url: string | null
           title: string
           updated_at: string
+          user_id: string | null
           weight: number | null
         }
         Insert: {
@@ -43,6 +44,7 @@ export type Database = {
           submission_url?: string | null
           title: string
           updated_at?: string
+          user_id?: string | null
           weight?: number | null
         }
         Update: {
@@ -58,6 +60,7 @@ export type Database = {
           submission_url?: string | null
           title?: string
           updated_at?: string
+          user_id?: string | null
           weight?: number | null
         }
         Relationships: [
@@ -82,6 +85,7 @@ export type Database = {
           instructor: string | null
           semester: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           blackboard_url?: string | null
@@ -94,6 +98,7 @@ export type Database = {
           instructor?: string | null
           semester?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           blackboard_url?: string | null
@@ -106,6 +111,7 @@ export type Database = {
           instructor?: string | null
           semester?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -120,6 +126,7 @@ export type Database = {
           is_processed: boolean
           material_type: string
           title: string
+          user_id: string | null
           week_number: number | null
         }
         Insert: {
@@ -132,6 +139,7 @@ export type Database = {
           is_processed?: boolean
           material_type?: string
           title: string
+          user_id?: string | null
           week_number?: number | null
         }
         Update: {
@@ -144,6 +152,7 @@ export type Database = {
           is_processed?: boolean
           material_type?: string
           title?: string
+          user_id?: string | null
           week_number?: number | null
         }
         Relationships: [
@@ -170,6 +179,7 @@ export type Database = {
           specific_date: string | null
           start_time: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           course_id: string
@@ -184,6 +194,7 @@ export type Database = {
           specific_date?: string | null
           start_time: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           course_id?: string
@@ -198,6 +209,7 @@ export type Database = {
           specific_date?: string | null
           start_time?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -219,6 +231,7 @@ export type Database = {
           started_at: string
           status: string
           sync_type: string
+          user_id: string | null
         }
         Insert: {
           completed_at?: string | null
@@ -229,6 +242,7 @@ export type Database = {
           started_at?: string
           status?: string
           sync_type?: string
+          user_id?: string | null
         }
         Update: {
           completed_at?: string | null
@@ -239,6 +253,7 @@ export type Database = {
           started_at?: string
           status?: string
           sync_type?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -252,6 +267,7 @@ export type Database = {
           is_resolved: boolean
           resolved_at: string | null
           severity: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -262,6 +278,7 @@ export type Database = {
           is_resolved?: boolean
           resolved_at?: string | null
           severity?: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -272,6 +289,7 @@ export type Database = {
           is_resolved?: boolean
           resolved_at?: string | null
           severity?: number
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -313,6 +331,7 @@ export type Database = {
           revenue_earned: number | null
           tasks_completed: number | null
           updated_at: string
+          user_id: string | null
           workouts_done: number | null
         }
         Insert: {
@@ -325,6 +344,7 @@ export type Database = {
           revenue_earned?: number | null
           tasks_completed?: number | null
           updated_at?: string
+          user_id?: string | null
           workouts_done?: number | null
         }
         Update: {
@@ -337,6 +357,7 @@ export type Database = {
           revenue_earned?: number | null
           tasks_completed?: number | null
           updated_at?: string
+          user_id?: string | null
           workouts_done?: number | null
         }
         Relationships: []
@@ -351,6 +372,7 @@ export type Database = {
           notes: string | null
           project_id: string | null
           start_time: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -361,6 +383,7 @@ export type Database = {
           notes?: string | null
           project_id?: string | null
           start_time?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -371,6 +394,7 @@ export type Database = {
           notes?: string | null
           project_id?: string | null
           start_time?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -393,6 +417,7 @@ export type Database = {
           is_addressed: boolean
           strength: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           counter_move?: string | null
@@ -404,6 +429,7 @@ export type Database = {
           is_addressed?: boolean
           strength?: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           counter_move?: string | null
@@ -415,6 +441,7 @@ export type Database = {
           is_addressed?: boolean
           strength?: number
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -441,6 +468,7 @@ export type Database = {
           timeframe: string
           title: string
           updated_at: string
+          user_id: string | null
           why_driver: string | null
         }
         Insert: {
@@ -457,6 +485,7 @@ export type Database = {
           timeframe?: string
           title: string
           updated_at?: string
+          user_id?: string | null
           why_driver?: string | null
         }
         Update: {
@@ -473,6 +502,7 @@ export type Database = {
           timeframe?: string
           title?: string
           updated_at?: string
+          user_id?: string | null
           why_driver?: string | null
         }
         Relationships: []
@@ -489,6 +519,7 @@ export type Database = {
           overall: number | null
           physical: number
           spiritual: number
+          user_id: string | null
         }
         Insert: {
           calculated_at?: string
@@ -501,6 +532,7 @@ export type Database = {
           overall?: number | null
           physical?: number
           spiritual?: number
+          user_id?: string | null
         }
         Update: {
           calculated_at?: string
@@ -513,6 +545,7 @@ export type Database = {
           overall?: number | null
           physical?: number
           spiritual?: number
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -528,6 +561,7 @@ export type Database = {
           last_mentioned: string | null
           name: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           color?: string | null
@@ -540,6 +574,7 @@ export type Database = {
           last_mentioned?: string | null
           name: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           color?: string | null
@@ -552,6 +587,7 @@ export type Database = {
           last_mentioned?: string | null
           name?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -564,6 +600,7 @@ export type Database = {
           source_id: string
           strength: number | null
           target_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -573,6 +610,7 @@ export type Database = {
           source_id: string
           strength?: number | null
           target_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -582,6 +620,7 @@ export type Database = {
           source_id?: string
           strength?: number | null
           target_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -610,6 +649,7 @@ export type Database = {
           required_level: number
           skill_name: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -620,6 +660,7 @@ export type Database = {
           required_level?: number
           skill_name: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -630,6 +671,7 @@ export type Database = {
           required_level?: number
           skill_name?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -654,6 +696,7 @@ export type Database = {
           stress: number
           trigger: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           context?: Json | null
@@ -667,6 +710,7 @@ export type Database = {
           stress: number
           trigger?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           context?: Json | null
@@ -680,6 +724,7 @@ export type Database = {
           stress?: number
           trigger?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -706,6 +751,7 @@ export type Database = {
           status: string
           updated_at: string
           url: string | null
+          user_id: string | null
         }
         Insert: {
           adhd_compatibility?: string
@@ -729,6 +775,7 @@ export type Database = {
           status?: string
           updated_at?: string
           url?: string | null
+          user_id?: string | null
         }
         Update: {
           adhd_compatibility?: string
@@ -752,6 +799,7 @@ export type Database = {
           status?: string
           updated_at?: string
           url?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -768,6 +816,7 @@ export type Database = {
           is_actionable: boolean
           pattern_type: string
           title: string
+          user_id: string | null
         }
         Insert: {
           action_taken?: boolean
@@ -781,6 +830,7 @@ export type Database = {
           is_actionable?: boolean
           pattern_type: string
           title: string
+          user_id?: string | null
         }
         Update: {
           action_taken?: boolean
@@ -794,6 +844,7 @@ export type Database = {
           is_actionable?: boolean
           pattern_type?: string
           title?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -810,6 +861,7 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -823,6 +875,7 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -836,6 +889,7 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -856,6 +910,7 @@ export type Database = {
           planned_hours: number
           revenue_this_week: number | null
           updated_at: string
+          user_id: string | null
           week_start: string
           what_failed: string | null
           what_worked: string | null
@@ -868,6 +923,7 @@ export type Database = {
           planned_hours?: number
           revenue_this_week?: number | null
           updated_at?: string
+          user_id?: string | null
           week_start: string
           what_failed?: string | null
           what_worked?: string | null
@@ -880,6 +936,7 @@ export type Database = {
           planned_hours?: number
           revenue_this_week?: number | null
           updated_at?: string
+          user_id?: string | null
           week_start?: string
           what_failed?: string | null
           what_worked?: string | null
