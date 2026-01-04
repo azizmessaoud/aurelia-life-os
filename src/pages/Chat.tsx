@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Sparkles, Trash2, Loader2 } from "lucide-react";
+import { Send, Sparkles, Trash2, Loader2, Network, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useChatMessages, useStreamingChat, useClearChat } from "@/hooks/useChat";
+import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useChatMessages, useStreamingChat, useClearChat, GraphContext } from "@/hooks/useChat";
 import { useActiveProjects } from "@/hooks/useProjects";
 import { useActiveOpportunities } from "@/hooks/useOpportunities";
 import { useCurrentWeekCapacity } from "@/hooks/useWeeklyCapacity";
@@ -41,6 +43,35 @@ function MessageBubble({ role, content, isStreaming }: { role: string; content: 
   );
 }
 
+// Graph Context Panel Component
+function GraphContextPanel({ graphContext }: { graphContext: GraphContext | null }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!graphContext || !graphContext.context) {
+    return null;
+  }
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="mt-2">
+      <CollapsibleTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-auto py-1 px-2 text-xs gap-1.5">
+          <Network className="h-3 w-3 text-primary" />
+          <span className="text-muted-foreground">Graph Context</span>
+          <Badge variant="secondary" className="h-4 px-1.5 text-[10px]">
+            {graphContext.entities_found} entities
+          </Badge>
+          {isOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+        </Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="mt-2 p-3 bg-muted/50 rounded-lg border text-xs font-mono whitespace-pre-wrap max-h-48 overflow-y-auto">
+          {graphContext.context}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
 const suggestedPrompts = [
   "What should I focus on today?",
   "Which income stream is most ADHD-friendly?",
@@ -58,7 +89,7 @@ export default function ChatPage() {
   const { data: weeklyCapacity } = useCurrentWeekCapacity();
   const { data: todayMinutes = 0 } = useTodaysDeepWorkMinutes();
   const { data: recentSessions = [] } = useDeepWorkSessions();
-  const { sendMessage, isStreaming, streamingContent } = useStreamingChat();
+  const { sendMessage, isStreaming, streamingContent, lastGraphContext } = useStreamingChat();
   const clearChat = useClearChat();
 
   const [input, setInput] = useState("");
@@ -157,6 +188,9 @@ export default function ChatPage() {
                 ))}
                 {isStreaming && streamingContent && (
                   <MessageBubble role="assistant" content={streamingContent} isStreaming />
+                )}
+                {!isStreaming && lastGraphContext && (
+                  <GraphContextPanel graphContext={lastGraphContext} />
                 )}
                 <div ref={messagesEndRef} />
               </div>

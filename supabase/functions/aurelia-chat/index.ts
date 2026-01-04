@@ -284,7 +284,41 @@ serve(async (req) => {
       });
     }
 
-    return new Response(response.body, {
+    // Create a new readable stream that prepends graph context metadata
+    const graphMetadata = JSON.stringify({
+      type: "graph_context",
+      context: graphContext || null,
+      entities_found: graphContext ? graphContext.split('\n').filter((l: string) => l.startsWith('- ')).length : 0,
+    });
+
+    const metadataLine = `data: ${graphMetadata}\n\n`;
+    const encoder = new TextEncoder();
+
+    const transformedStream = new ReadableStream({
+      async start(controller) {
+        // Send graph context metadata first
+        controller.enqueue(encoder.encode(metadataLine));
+        
+        // Then pipe through the AI response
+        const reader = response.body?.getReader();
+        if (!reader) {
+          controller.close();
+          return;
+        }
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            controller.enqueue(value);
+          }
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(transformedStream, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (error) {
