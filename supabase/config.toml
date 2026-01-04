@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.agent-council]
 verify_jwt = false
+
+[functions.detect-patterns]
+verify_jwt = false
