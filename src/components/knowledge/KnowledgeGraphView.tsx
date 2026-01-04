@@ -76,6 +76,7 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
   const [dragging, setDragging] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'full' | 'backbone'>('full');
   const [focusedEntityId, setFocusedEntityId] = useState<string | null>(null);
+  const [connectionsExpanded, setConnectionsExpanded] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const animationRef = useRef<number>();
 
@@ -97,6 +98,7 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
       if (matchedEntity) {
         setSelectedNode(matchedEntity);
         setFocusedEntityId(matchedEntity.id);
+        setConnectionsExpanded(true); // Auto-expand connections when navigating from chat
         
         // Clear the focus animation after 3 seconds
         const timeout = setTimeout(() => {
@@ -573,20 +575,33 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
 
             {selectedConnections.length > 0 && (
               <div className="border-t pt-3">
-                <p className="text-xs font-medium mb-2">Connections:</p>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {selectedConnections.map((conn) => (
-                    <div 
-                      key={conn.id}
-                      className="text-xs p-1.5 rounded bg-muted/50 flex items-center gap-1"
-                    >
-                      <span className={conn.direction === 'outgoing' ? 'text-primary' : 'text-muted-foreground'}>
-                        {conn.direction === 'outgoing' ? '→' : '←'}
-                      </span>
-                      <span>{conn.label}</span>
-                    </div>
-                  ))}
-                </div>
+                <button
+                  onClick={() => setConnectionsExpanded(!connectionsExpanded)}
+                  className="flex items-center justify-between w-full text-xs font-medium mb-2 hover:text-primary transition-colors"
+                >
+                  <span>Connections ({selectedConnections.length})</span>
+                  <span className={cn(
+                    "transition-transform duration-200",
+                    connectionsExpanded ? "rotate-180" : ""
+                  )}>
+                    ▼
+                  </span>
+                </button>
+                {connectionsExpanded && (
+                  <div className="space-y-1 max-h-40 overflow-y-auto animate-fade-in">
+                    {selectedConnections.map((conn) => (
+                      <div 
+                        key={conn.id}
+                        className="text-xs p-1.5 rounded bg-muted/50 flex items-center gap-1"
+                      >
+                        <span className={conn.direction === 'outgoing' ? 'text-primary' : 'text-muted-foreground'}>
+                          {conn.direction === 'outgoing' ? '→' : '←'}
+                        </span>
+                        <span>{conn.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
