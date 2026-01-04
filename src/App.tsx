@@ -15,6 +15,7 @@ import Goals from "./pages/Goals";
 import GPSCommandCenter from "./pages/GPSCommandCenter";
 import Intelligence from "./pages/Intelligence";
 import WeeklyReview from "./pages/WeeklyReview";
+import AcademicHub from "./pages/AcademicHub";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/gps" element={<GPSCommandCenter />} />
           <Route path="/goals" element={<Goals />} />
           <Route path="/intelligence" element={<Intelligence />} />
+          <Route path="/academic" element={<AcademicHub />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/deep-work" element={<DeepWork />} />
           <Route path="/capacity" element={<Capacity />} />

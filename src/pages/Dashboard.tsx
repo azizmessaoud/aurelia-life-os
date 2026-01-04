@@ -6,7 +6,9 @@ import {
   Zap,
   Target,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  GraduationCap,
+  FileText
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,8 +19,9 @@ import { useActiveSession, useTodaysDeepWorkMinutes, useWeeklyDeepWorkMinutes, u
 import { useCurrentWeekCapacity, useADHDTaxAverage } from "@/hooks/useWeeklyCapacity";
 import { useQuickWinOpportunities } from "@/hooks/useOpportunities";
 import { useAverageEnergy } from "@/hooks/useMoodLogs";
+import { useUpcomingAssignments, useTodaySchedule } from "@/hooks/useAcademic";
 import { Link } from "react-router-dom";
-import { format, differenceInDays, differenceInMinutes } from "date-fns";
+import { format, differenceInDays, differenceInMinutes, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { MoodQuickLog } from "@/components/mood/MoodQuickLog";
@@ -217,6 +220,90 @@ function QuickWins() {
   );
 }
 
+function AcademicWidget() {
+  const { data: upcoming } = useUpcomingAssignments(7);
+  const { data: todayClasses } = useTodaySchedule();
+  
+  const urgentCount = upcoming?.filter(a => {
+    const daysUntil = Math.ceil((new Date(a.due_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    return daysUntil <= 2;
+  }).length || 0;
+
+  return (
+    <Card className="glass-card">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center justify-between">
+          <span className="flex items-center gap-2">
+            <GraduationCap className="h-4 w-4 text-primary" />
+            Academic
+          </span>
+          {urgentCount > 0 && (
+            <Badge variant="destructive" className="text-xs">
+              {urgentCount} urgent
+            </Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {/* Today's Classes */}
+        {todayClasses && todayClasses.length > 0 && (
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">Today's Classes</p>
+            <div className="space-y-1">
+              {todayClasses.slice(0, 2).map((item) => (
+                <div key={item.id} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-2 h-2 rounded-full" 
+                      style={{ backgroundColor: item.course?.color }}
+                    />
+                    <span>{item.course?.course_code}</span>
+                  </div>
+                  <span className="text-muted-foreground text-xs">
+                    {item.start_time.slice(0, 5)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Upcoming Deadlines */}
+        {upcoming && upcoming.length > 0 && (
+          <div>
+            <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
+              <FileText className="h-3 w-3" />
+              Upcoming Deadlines
+            </p>
+            <div className="space-y-1">
+              {upcoming.slice(0, 2).map((assignment) => (
+                <div key={assignment.id} className="flex items-center justify-between text-sm">
+                  <span className="truncate flex-1 mr-2">{assignment.title}</span>
+                  <span className="text-muted-foreground text-xs whitespace-nowrap">
+                    {formatDistanceToNow(new Date(assignment.due_date), { addSuffix: true })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {(!upcoming || upcoming.length === 0) && (!todayClasses || todayClasses.length === 0) && (
+          <p className="text-sm text-muted-foreground text-center py-2">
+            No classes or deadlines today
+          </p>
+        )}
+        
+        <Link to="/academic">
+          <Button variant="outline" size="sm" className="w-full">
+            View Academic Hub
+          </Button>
+        </Link>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Dashboard() {
   const { data: todayMinutes = 0 } = useTodaysDeepWorkMinutes();
   const { data: weeklyMinutes = 0 } = useWeeklyDeepWorkMinutes();
@@ -298,10 +385,13 @@ export default function Dashboard() {
             <MoodQuickLog />
           </div>
 
-          {/* Right Column: Energy Trends + Quick Wins */}
+          {/* Right Column: Energy Trends + Academic + Quick Wins */}
           <div className="space-y-4">
             {/* Energy Trends */}
             <MoodTrendsCard />
+            
+            {/* Academic Widget */}
+            <AcademicWidget />
             
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-success" />

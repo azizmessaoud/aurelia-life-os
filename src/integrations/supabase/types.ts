@@ -14,6 +14,234 @@ export type Database = {
   }
   public: {
     Tables: {
+      academic_assignments: {
+        Row: {
+          course_id: string
+          created_at: string
+          description: string | null
+          due_date: string
+          grade: number | null
+          id: string
+          is_exam: boolean
+          max_grade: number | null
+          status: string
+          submission_url: string | null
+          title: string
+          updated_at: string
+          weight: number | null
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          description?: string | null
+          due_date: string
+          grade?: number | null
+          id?: string
+          is_exam?: boolean
+          max_grade?: number | null
+          status?: string
+          submission_url?: string | null
+          title: string
+          updated_at?: string
+          weight?: number | null
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string
+          grade?: number | null
+          id?: string
+          is_exam?: boolean
+          max_grade?: number | null
+          status?: string
+          submission_url?: string | null
+          title?: string
+          updated_at?: string
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "academic_assignments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "academic_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      academic_courses: {
+        Row: {
+          blackboard_url: string | null
+          color: string | null
+          course_code: string
+          course_name: string
+          created_at: string
+          credits: number | null
+          id: string
+          instructor: string | null
+          semester: string
+          updated_at: string
+        }
+        Insert: {
+          blackboard_url?: string | null
+          color?: string | null
+          course_code: string
+          course_name: string
+          created_at?: string
+          credits?: number | null
+          id?: string
+          instructor?: string | null
+          semester?: string
+          updated_at?: string
+        }
+        Update: {
+          blackboard_url?: string | null
+          color?: string | null
+          course_code?: string
+          course_name?: string
+          created_at?: string
+          credits?: number | null
+          id?: string
+          instructor?: string | null
+          semester?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      academic_materials: {
+        Row: {
+          ai_summary: string | null
+          course_id: string
+          created_at: string
+          description: string | null
+          file_url: string | null
+          id: string
+          is_processed: boolean
+          material_type: string
+          title: string
+          week_number: number | null
+        }
+        Insert: {
+          ai_summary?: string | null
+          course_id: string
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          is_processed?: boolean
+          material_type?: string
+          title: string
+          week_number?: number | null
+        }
+        Update: {
+          ai_summary?: string | null
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          is_processed?: boolean
+          material_type?: string
+          title?: string
+          week_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "academic_materials_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "academic_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      academic_schedule: {
+        Row: {
+          course_id: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          is_recurring: boolean
+          location: string | null
+          notes: string | null
+          schedule_type: string
+          specific_date: string | null
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          is_recurring?: boolean
+          location?: string | null
+          notes?: string | null
+          schedule_type?: string
+          specific_date?: string | null
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          is_recurring?: boolean
+          location?: string | null
+          notes?: string | null
+          schedule_type?: string
+          specific_date?: string | null
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "academic_schedule_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "academic_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blackboard_sync_logs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          items_synced: number | null
+          started_at: string
+          status: string
+          sync_type: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          items_synced?: number | null
+          started_at?: string
+          status?: string
+          sync_type?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          items_synced?: number | null
+          started_at?: string
+          status?: string
+          sync_type?: string
+        }
+        Relationships: []
+      }
       burnout_indicators: {
         Row: {
           created_at: string
