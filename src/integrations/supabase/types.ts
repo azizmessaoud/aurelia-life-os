@@ -51,18 +51,21 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          graph_context: Json | null
           id: string
           role: string
         }
         Insert: {
           content: string
           created_at?: string
+          graph_context?: Json | null
           id?: string
           role: string
         }
         Update: {
           content?: string
           created_at?: string
+          graph_context?: Json | null
           id?: string
           role?: string
         }
