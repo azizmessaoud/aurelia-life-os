@@ -77,8 +77,15 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
   const [viewMode, setViewMode] = useState<'full' | 'backbone'>('full');
   const [focusedEntityId, setFocusedEntityId] = useState<string | null>(null);
   const [connectionsExpanded, setConnectionsExpanded] = useState(false);
+  const [viewOffset, setViewOffset] = useState({ x: 0, y: 0 });
   const svgRef = useRef<SVGSVGElement>(null);
   const animationRef = useRef<number>();
+
+  // Constants for viewBox
+  const VIEW_WIDTH = 800;
+  const VIEW_HEIGHT = 500;
+  const VIEW_CENTER_X = VIEW_WIDTH / 2;
+  const VIEW_CENTER_Y = VIEW_HEIGHT / 2;
 
   // Determine which nodes are "backbone" (high importance)
   const backboneNodeIds = useMemo(() => {
@@ -99,6 +106,20 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
         setSelectedNode(matchedEntity);
         setFocusedEntityId(matchedEntity.id);
         setConnectionsExpanded(true); // Auto-expand connections when navigating from chat
+        
+        // Pan to center the entity after positions are initialized
+        setTimeout(() => {
+          setPositions(prev => {
+            const entityPos = prev[matchedEntity.id];
+            if (entityPos) {
+              // Calculate offset to center the entity
+              const offsetX = entityPos.x - VIEW_CENTER_X;
+              const offsetY = entityPos.y - VIEW_CENTER_Y;
+              setViewOffset({ x: offsetX, y: offsetY });
+            }
+            return prev;
+          });
+        }, 150); // Small delay to ensure positions are initialized
         
         // Clear the focus animation after 3 seconds
         const timeout = setTimeout(() => {
@@ -313,6 +334,16 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
           </Button>
         </div>
         <div className="flex items-center gap-2">
+          {(viewOffset.x !== 0 || viewOffset.y !== 0) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setViewOffset({ x: 0, y: 0 })}
+              className="text-xs"
+            >
+              Reset View
+            </Button>
+          )}
           {viewMode === 'backbone' && (
             <Badge variant="secondary" className="text-xs">
               {backboneNodeIds.size} of {entities.length} entities • importance ≥ 7, strength ≥ 6
@@ -327,12 +358,19 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
           ref={svgRef}
           width="100%"
           height="100%"
-          viewBox="0 0 800 500"
+          viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
           className="cursor-grab active:cursor-grabbing"
         >
+          {/* Animated transform group for panning */}
+          <g
+            style={{
+              transform: `translate(${-viewOffset.x}px, ${-viewOffset.y}px)`,
+              transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
           {/* Edges */}
           {filteredRelationships.map(rel => {
             const source = positions[rel.source_id];
@@ -516,6 +554,7 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
               </g>
             );
           })}
+          </g>
         </svg>
       </div>
 
