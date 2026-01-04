@@ -10,6 +10,31 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { 
+  Lightbulb, 
+  Target, 
+  AlertTriangle, 
+  User, 
+  Wrench, 
+  Brain,
+  Trophy,
+  Heart,
+  Repeat,
+  type LucideIcon 
+} from "lucide-react";
+
+// Icon mapping for entity types
+const ENTITY_ICONS: Record<EntityType, LucideIcon> = {
+  pattern: Lightbulb,
+  project: Target,
+  blocker: AlertTriangle,
+  person: User,
+  tool: Wrench,
+  skill: Brain,
+  win: Trophy,
+  emotion: Heart,
+  habit: Repeat,
+};
 
 interface NodePosition {
   x: number;
@@ -260,6 +285,8 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
             if (!pos) return null;
             const size = getNodeSize(entity);
             const isSelected = selectedNode?.id === entity.id;
+            const IconComponent = ENTITY_ICONS[entity.entity_type as EntityType];
+            const iconSize = Math.max(10, size * 0.7);
 
             return (
               <g
@@ -287,6 +314,24 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
                   strokeWidth={isSelected ? 3 : 0}
                   className="transition-all duration-150"
                 />
+                {/* Entity type icon */}
+                {IconComponent && (
+                  <foreignObject
+                    x={pos.x - iconSize / 2}
+                    y={pos.y - iconSize / 2}
+                    width={iconSize}
+                    height={iconSize}
+                    style={{ pointerEvents: 'none' }}
+                  >
+                    <div className="flex items-center justify-center w-full h-full">
+                      <IconComponent 
+                        size={iconSize * 0.8} 
+                        className="text-white drop-shadow-sm"
+                        strokeWidth={2.5}
+                      />
+                    </div>
+                  </foreignObject>
+                )}
                 {/* Label */}
                 <text
                   x={pos.x}
@@ -306,20 +351,20 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
 
       {/* Legend */}
       <div className="flex flex-wrap gap-2 mt-3">
-        {Object.entries(ENTITY_COLORS).map(([type, color]) => (
-          <Badge 
-            key={type} 
-            variant="outline" 
-            className="text-xs capitalize"
-            style={{ borderColor: color, color }}
-          >
-            <span 
-              className="w-2 h-2 rounded-full mr-1.5" 
-              style={{ backgroundColor: color }}
-            />
-            {type}
-          </Badge>
-        ))}
+        {Object.entries(ENTITY_COLORS).map(([type, color]) => {
+          const IconComponent = ENTITY_ICONS[type as EntityType];
+          return (
+            <Badge 
+              key={type} 
+              variant="outline" 
+              className="text-xs capitalize"
+              style={{ borderColor: color, color }}
+            >
+              {IconComponent && <IconComponent size={12} className="mr-1.5" />}
+              {type}
+            </Badge>
+          );
+        })}
       </div>
 
       {/* Selected Node Details */}
