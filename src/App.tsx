@@ -11,6 +11,8 @@ import Opportunities from "./pages/Opportunities";
 import Chat from "./pages/Chat";
 import KnowledgeGraph from "./pages/KnowledgeGraph";
 import Council from "./pages/Council";
+import Goals from "./pages/Goals";
+import GPSCommandCenter from "./pages/GPSCommandCenter";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/gps" element={<GPSCommandCenter />} />
+          <Route path="/goals" element={<Goals />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/deep-work" element={<DeepWork />} />
           <Route path="/capacity" element={<Capacity />} />
