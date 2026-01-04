@@ -45,7 +45,7 @@ export function AppSidebar() {
           </div>
           <div>
             <h1 className="text-lg font-semibold gradient-text">AURELIA</h1>
-            <p className="text-[10px] text-muted-foreground tracking-wide uppercase">Personal AI OS</p>
+            <p className="text-[10px] text-muted-foreground tracking-wide uppercase">Aziz's AI Life OS</p>
           </div>
         </div>
 
