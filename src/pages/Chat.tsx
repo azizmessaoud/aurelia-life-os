@@ -11,6 +11,7 @@ import { useActiveOpportunities } from "@/hooks/useOpportunities";
 import { useCurrentWeekCapacity } from "@/hooks/useWeeklyCapacity";
 import { useTodaysDeepWorkMinutes, useDeepWorkSessions } from "@/hooks/useDeepWork";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { HighlightedContent } from "@/components/chat/HighlightedContent";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -43,7 +44,7 @@ function MessageBubble({
           </div>
         )}
         <div className="text-sm whitespace-pre-wrap leading-relaxed">
-          {content}
+          {isUser ? content : <HighlightedContent content={content} graphContext={graphContext} />}
           {isStreaming && (
             <span className="inline-block w-1.5 h-4 bg-primary ml-0.5 animate-pulse" />
           )}
