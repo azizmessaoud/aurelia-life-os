@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      burnout_indicators: {
+        Row: {
+          created_at: string
+          description: string | null
+          detected_at: string
+          id: string
+          indicator_type: string
+          is_resolved: boolean
+          resolved_at: string | null
+          severity: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          detected_at?: string
+          id?: string
+          indicator_type: string
+          is_resolved?: boolean
+          resolved_at?: string | null
+          severity?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          detected_at?: string
+          id?: string
+          indicator_type?: string
+          is_resolved?: boolean
+          resolved_at?: string | null
+          severity?: number
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -207,6 +240,45 @@ export type Database = {
           title?: string
           updated_at?: string
           why_driver?: string | null
+        }
+        Relationships: []
+      }
+      health_scores: {
+        Row: {
+          calculated_at: string
+          created_at: string
+          emotional: number
+          hormonal: number
+          id: string
+          mental: number
+          notes: string | null
+          overall: number | null
+          physical: number
+          spiritual: number
+        }
+        Insert: {
+          calculated_at?: string
+          created_at?: string
+          emotional?: number
+          hormonal?: number
+          id?: string
+          mental?: number
+          notes?: string | null
+          overall?: number | null
+          physical?: number
+          spiritual?: number
+        }
+        Update: {
+          calculated_at?: string
+          created_at?: string
+          emotional?: number
+          hormonal?: number
+          id?: string
+          mental?: number
+          notes?: string | null
+          overall?: number | null
+          physical?: number
+          spiritual?: number
         }
         Relationships: []
       }
@@ -446,6 +518,48 @@ export type Database = {
           status?: string
           updated_at?: string
           url?: string | null
+        }
+        Relationships: []
+      }
+      pattern_insights: {
+        Row: {
+          action_taken: boolean
+          confidence: number
+          created_at: string
+          data: Json | null
+          description: string
+          detected_at: string
+          expires_at: string | null
+          id: string
+          is_actionable: boolean
+          pattern_type: string
+          title: string
+        }
+        Insert: {
+          action_taken?: boolean
+          confidence?: number
+          created_at?: string
+          data?: Json | null
+          description: string
+          detected_at?: string
+          expires_at?: string | null
+          id?: string
+          is_actionable?: boolean
+          pattern_type: string
+          title: string
+        }
+        Update: {
+          action_taken?: boolean
+          confidence?: number
+          created_at?: string
+          data?: Json | null
+          description?: string
+          detected_at?: string
+          expires_at?: string | null
+          id?: string
+          is_actionable?: boolean
+          pattern_type?: string
+          title?: string
         }
         Relationships: []
       }

@@ -13,6 +13,7 @@ import KnowledgeGraph from "./pages/KnowledgeGraph";
 import Council from "./pages/Council";
 import Goals from "./pages/Goals";
 import GPSCommandCenter from "./pages/GPSCommandCenter";
+import Intelligence from "./pages/Intelligence";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="/gps" element={<GPSCommandCenter />} />
           <Route path="/goals" element={<Goals />} />
+          <Route path="/intelligence" element={<Intelligence />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/deep-work" element={<DeepWork />} />
           <Route path="/capacity" element={<Capacity />} />
