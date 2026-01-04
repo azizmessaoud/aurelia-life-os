@@ -75,6 +75,7 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
   const [positions, setPositions] = useState<Record<string, NodePosition>>({});
   const [dragging, setDragging] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'full' | 'backbone'>('full');
+  const [focusedEntityId, setFocusedEntityId] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const animationRef = useRef<number>();
 
@@ -95,6 +96,14 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
       );
       if (matchedEntity) {
         setSelectedNode(matchedEntity);
+        setFocusedEntityId(matchedEntity.id);
+        
+        // Clear the focus animation after 3 seconds
+        const timeout = setTimeout(() => {
+          setFocusedEntityId(null);
+        }, 3000);
+        
+        return () => clearTimeout(timeout);
       }
     }
   }, [focusEntityName, entities]);
@@ -417,6 +426,29 @@ export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGrap
                 style={{ cursor: 'pointer', opacity: nodeOpacity }}
                 className="transition-opacity duration-300"
               >
+                {/* Focus highlight animation (from chat navigation) */}
+                {focusedEntityId === entity.id && (
+                  <>
+                    <circle
+                      cx={pos.x}
+                      cy={pos.y}
+                      r={size + 20}
+                      fill="none"
+                      stroke={ENTITY_COLORS[entity.entity_type as EntityType]}
+                      strokeWidth={3}
+                      strokeOpacity={0.6}
+                      className="animate-[ping_1s_ease-out_infinite]"
+                    />
+                    <circle
+                      cx={pos.x}
+                      cy={pos.y}
+                      r={size + 12}
+                      fill={ENTITY_COLORS[entity.entity_type as EntityType]}
+                      fillOpacity={0.15}
+                      className="animate-pulse"
+                    />
+                  </>
+                )}
                 {/* Backbone glow effect */}
                 {viewMode === 'backbone' && isBackboneNode && (
                   <circle
