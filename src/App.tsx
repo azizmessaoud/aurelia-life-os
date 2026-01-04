@@ -10,6 +10,7 @@ import Capacity from "./pages/Capacity";
 import Opportunities from "./pages/Opportunities";
 import Chat from "./pages/Chat";
 import KnowledgeGraph from "./pages/KnowledgeGraph";
+import Council from "./pages/Council";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/knowledge" element={<KnowledgeGraph />} />
+          <Route path="/council" element={<Council />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

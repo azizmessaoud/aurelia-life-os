@@ -6,7 +6,8 @@ import {
   Search, 
   MessageSquare,
   Sparkles,
-  Network
+  Network,
+  Users
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ const navItems = [
   { icon: TrendingUp, label: "Capacity", path: "/capacity" },
   { icon: Search, label: "Opportunities", path: "/opportunities" },
   { icon: Network, label: "Knowledge Graph", path: "/knowledge" },
+  { icon: Users, label: "Agent Council", path: "/council" },
   { icon: MessageSquare, label: "Chat with AURELIA", path: "/chat" },
 ];
 
