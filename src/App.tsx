@@ -14,6 +14,7 @@ import Council from "./pages/Council";
 import Goals from "./pages/Goals";
 import GPSCommandCenter from "./pages/GPSCommandCenter";
 import Intelligence from "./pages/Intelligence";
+import WeeklyReview from "./pages/WeeklyReview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/projects" element={<Projects />} />
           <Route path="/deep-work" element={<DeepWork />} />
           <Route path="/capacity" element={<Capacity />} />
+          <Route path="/review" element={<WeeklyReview />} />
           <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/knowledge" element={<KnowledgeGraph />} />

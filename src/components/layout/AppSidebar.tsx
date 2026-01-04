@@ -10,7 +10,8 @@ import {
   Users,
   Compass,
   Target,
-  Brain
+  Brain,
+  BookOpen
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ const navItems = [
   { icon: FolderKanban, label: "Projects", path: "/projects" },
   { icon: Timer, label: "Deep Work", path: "/deep-work" },
   { icon: TrendingUp, label: "Capacity", path: "/capacity" },
+  { icon: BookOpen, label: "Weekly Review", path: "/review" },
   { icon: Search, label: "Opportunities", path: "/opportunities" },
   { icon: Network, label: "Knowledge Graph", path: "/knowledge" },
   { icon: Users, label: "Agent Council", path: "/council" },
