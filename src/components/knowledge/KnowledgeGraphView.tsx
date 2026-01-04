@@ -8,6 +8,7 @@ import {
 } from "@/hooks/useKnowledgeGraph";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { 
@@ -20,8 +21,14 @@ import {
   Trophy,
   Heart,
   Repeat,
+  Eye,
+  Focus,
   type LucideIcon 
 } from "lucide-react";
+
+// Backbone view thresholds
+const BACKBONE_IMPORTANCE_THRESHOLD = 7;
+const BACKBONE_STRENGTH_THRESHOLD = 6;
 
 // Icon mapping for entity types
 const ENTITY_ICONS: Record<EntityType, LucideIcon> = {
@@ -66,8 +73,28 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
   const [selectedNode, setSelectedNode] = useState<KnowledgeEntity | null>(null);
   const [positions, setPositions] = useState<Record<string, NodePosition>>({});
   const [dragging, setDragging] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'full' | 'backbone'>('full');
   const svgRef = useRef<SVGSVGElement>(null);
   const animationRef = useRef<number>();
+
+  // Determine which nodes are "backbone" (high importance)
+  const backboneNodeIds = useMemo(() => {
+    return new Set(
+      entities
+        .filter(e => (e.importance || 5) >= BACKBONE_IMPORTANCE_THRESHOLD)
+        .map(e => e.id)
+    );
+  }, [entities]);
+
+  // Filter relationships for backbone view
+  const filteredRelationships = useMemo(() => {
+    if (viewMode === 'full') return relationships;
+    return relationships.filter(r => 
+      (r.strength || 5) >= BACKBONE_STRENGTH_THRESHOLD &&
+      backboneNodeIds.has(r.source_id) &&
+      backboneNodeIds.has(r.target_id)
+    );
+  }, [relationships, viewMode, backboneNodeIds]);
 
   // Initialize positions
   useEffect(() => {
@@ -241,6 +268,35 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
 
   return (
     <div className={cn("relative w-full", className)}>
+      {/* View Mode Toggle */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Button
+            variant={viewMode === 'full' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('full')}
+          >
+            <Eye className="h-4 w-4 mr-1.5" />
+            Full View
+          </Button>
+          <Button
+            variant={viewMode === 'backbone' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setViewMode('backbone')}
+          >
+            <Focus className="h-4 w-4 mr-1.5" />
+            Backbone
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          {viewMode === 'backbone' && (
+            <Badge variant="secondary" className="text-xs">
+              {backboneNodeIds.size} of {entities.length} entities • importance ≥ 7, strength ≥ 6
+            </Badge>
+          )}
+        </div>
+      </div>
+
       {/* Graph Canvas */}
       <div className="w-full h-[500px] rounded-lg overflow-hidden border bg-card">
         <svg
@@ -254,21 +310,18 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
           className="cursor-grab active:cursor-grabbing"
         >
           {/* Edges */}
-          {relationships.map(rel => {
+          {filteredRelationships.map(rel => {
             const source = positions[rel.source_id];
             const target = positions[rel.target_id];
             if (!source || !target) return null;
 
             const edgeColor = RELATIONSHIP_COLORS[rel.relationship_type] || '#94A3B8';
             const label = RELATIONSHIP_LABELS[rel.relationship_type] || rel.relationship_type;
+            const isBackboneEdge = viewMode === 'backbone';
             
             // Calculate midpoint for label
             const midX = (source.x + target.x) / 2;
             const midY = (source.y + target.y) / 2;
-            
-            // Calculate angle for label rotation
-            const angle = Math.atan2(target.y - source.y, target.x - source.x) * (180 / Math.PI);
-            const adjustedAngle = angle > 90 || angle < -90 ? angle + 180 : angle;
 
             return (
               <g key={rel.id}>
@@ -278,8 +331,8 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
                   x2={target.x}
                   y2={target.y}
                   stroke={edgeColor}
-                  strokeWidth={Math.max(1.5, rel.strength / 2.5)}
-                  strokeOpacity={0.6}
+                  strokeWidth={isBackboneEdge ? Math.max(2, (rel.strength || 5) / 2) : Math.max(1.5, (rel.strength || 5) / 2.5)}
+                  strokeOpacity={isBackboneEdge ? 0.85 : 0.6}
                   markerEnd={`url(#arrowhead-${rel.relationship_type})`}
                 />
                 {/* Edge label */}
@@ -337,15 +390,33 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
             if (!pos) return null;
             const size = getNodeSize(entity);
             const isSelected = selectedNode?.id === entity.id;
+            const isBackboneNode = backboneNodeIds.has(entity.id);
             const IconComponent = ENTITY_ICONS[entity.entity_type as EntityType];
             const iconSize = Math.max(10, size * 0.7);
+            
+            // Apply opacity for non-backbone nodes in backbone view
+            const nodeOpacity = viewMode === 'backbone' && !isBackboneNode ? 0.2 : 1;
 
             return (
               <g
                 key={entity.id}
                 onMouseDown={() => handleMouseDown(entity.id)}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', opacity: nodeOpacity }}
+                className="transition-opacity duration-300"
               >
+                {/* Backbone glow effect */}
+                {viewMode === 'backbone' && isBackboneNode && (
+                  <circle
+                    cx={pos.x}
+                    cy={pos.y}
+                    r={size + 6}
+                    fill="none"
+                    stroke={ENTITY_COLORS[entity.entity_type as EntityType]}
+                    strokeWidth={2}
+                    strokeOpacity={0.5}
+                    className="animate-pulse"
+                  />
+                )}
                 {/* Glow effect for selected */}
                 {isSelected && (
                   <circle
@@ -362,8 +433,8 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
                   cy={pos.y}
                   r={size}
                   fill={entity.color || ENTITY_COLORS[entity.entity_type as EntityType]}
-                  stroke={isSelected ? "white" : "none"}
-                  strokeWidth={isSelected ? 3 : 0}
+                  stroke={isSelected ? "white" : viewMode === 'backbone' && isBackboneNode ? "white" : "none"}
+                  strokeWidth={isSelected ? 3 : viewMode === 'backbone' && isBackboneNode ? 2 : 0}
                   className="transition-all duration-150"
                 />
                 {/* Entity type icon */}
@@ -391,7 +462,7 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
                   textAnchor="middle"
                   fill="hsl(var(--foreground))"
                   fontSize={11}
-                  fontWeight={isSelected ? 600 : 400}
+                  fontWeight={isSelected || (viewMode === 'backbone' && isBackboneNode) ? 600 : 400}
                 >
                   {entity.name}
                 </text>
