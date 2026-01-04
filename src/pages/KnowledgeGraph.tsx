@@ -5,8 +5,11 @@ import { useKnowledgeEntities, ENTITY_COLORS, EntityType } from "@/hooks/useKnow
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Network, Brain, Sparkles } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 export default function KnowledgeGraph() {
+  const [searchParams] = useSearchParams();
+  const focusEntityName = searchParams.get('entity');
   const { data: entities = [] } = useKnowledgeEntities();
 
   // Count entities by type
@@ -89,7 +92,7 @@ export default function KnowledgeGraph() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <KnowledgeGraphView />
+            <KnowledgeGraphView focusEntityName={focusEntityName} />
           </CardContent>
         </Card>
 
