@@ -12,6 +12,7 @@ export type ChatMessage = {
   role: "user" | "assistant";
   content: string;
   created_at: string;
+  user_id?: string | null;
   graph_context?: GraphContext | null;
 };
 
@@ -26,7 +27,11 @@ export function useChatMessages() {
         .limit(100);
 
       if (error) throw error;
-      return data as ChatMessage[];
+      return (data || []).map(msg => ({
+        ...msg,
+        role: msg.role as "user" | "assistant",
+        graph_context: msg.graph_context as GraphContext | null,
+      })) as ChatMessage[];
     },
   });
 }
@@ -40,9 +45,14 @@ export function useSaveMessage() {
       content: string;
       graph_context?: GraphContext | null;
     }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { data, error } = await supabase
         .from("chat_messages")
-        .insert(message)
+        .insert({
+          ...message,
+          user_id: user?.id,
+        })
         .select()
         .single();
 
