@@ -9,10 +9,21 @@ export interface AgentResponse {
   response: string;
 }
 
+export interface VetoResult {
+  triggered: boolean;
+  reason: string;
+  message: string;
+  severity: "critical" | "warning";
+  allowOverride: boolean;
+  recoveryActions: string[];
+}
+
 export interface CouncilResult {
   agentResponses: AgentResponse[];
   synthesis: string;
   timestamp: string;
+  vetoActive?: boolean;
+  veto?: VetoResult;
 }
 
 export interface AcademicContext {
@@ -76,18 +87,21 @@ export function useAgentCouncil() {
   const [currentPhase, setCurrentPhase] = useState<"idle" | "agents" | "synthesis">("idle");
   const [agentResponses, setAgentResponses] = useState<AgentResponse[]>([]);
   const [synthesis, setSynthesis] = useState<string>("");
+  const [vetoResult, setVetoResult] = useState<VetoResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const conveneCouncil = useCallback(
     async (
       message: string,
       context: CouncilContext,
-      selectedAgents?: AgentType[]
+      selectedAgents?: AgentType[],
+      forceOverride?: boolean
     ): Promise<CouncilResult | null> => {
       setIsProcessing(true);
       setCurrentPhase("agents");
       setAgentResponses([]);
       setSynthesis("");
+      setVetoResult(null);
       setError(null);
 
       try {
@@ -103,6 +117,7 @@ export function useAgentCouncil() {
               message,
               context,
               selectedAgents: selectedAgents || Object.keys(AGENT_INFO),
+              forceOverride,
             }),
           }
         );
@@ -120,6 +135,20 @@ export function useAgentCouncil() {
 
         const result = await response.json();
 
+        // Handle VETO response
+        if (result.vetoActive && result.veto) {
+          setVetoResult(result.veto);
+          setCurrentPhase("idle");
+          setIsProcessing(false);
+          return {
+            agentResponses: [],
+            synthesis: "",
+            timestamp: result.timestamp,
+            vetoActive: true,
+            veto: result.veto,
+          };
+        }
+
         setAgentResponses(result.agentResponses || []);
         setCurrentPhase("synthesis");
         
@@ -133,6 +162,8 @@ export function useAgentCouncil() {
           agentResponses: result.agentResponses,
           synthesis: result.synthesis,
           timestamp: result.timestamp,
+          vetoActive: false,
+          veto: null,
         };
       } catch (err) {
         console.error("Agent Council error:", err);
@@ -151,6 +182,7 @@ export function useAgentCouncil() {
     setCurrentPhase("idle");
     setAgentResponses([]);
     setSynthesis("");
+    setVetoResult(null);
     setError(null);
   }, []);
 
@@ -161,6 +193,7 @@ export function useAgentCouncil() {
     currentPhase,
     agentResponses,
     synthesis,
+    vetoResult,
     error,
   };
 }
