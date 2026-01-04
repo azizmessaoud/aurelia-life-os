@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { GraphContext } from "@/hooks/useChat";
+import { useNavigate } from "react-router-dom";
 
 interface HighlightedContentProps {
   content: string;
@@ -66,6 +67,8 @@ function getEntityColors(type: string) {
 }
 
 export function HighlightedContent({ content, graphContext }: HighlightedContentProps) {
+  const navigate = useNavigate();
+  
   if (!graphContext?.context) {
     return <>{content}</>;
   }
@@ -84,6 +87,10 @@ export function HighlightedContent({ content, graphContext }: HighlightedContent
   
   // Split content by the pattern while keeping matched parts
   const parts = content.split(pattern);
+
+  const handleEntityClick = (entityName: string) => {
+    navigate(`/knowledge?entity=${encodeURIComponent(entityName)}`);
+  };
   
   return (
     <TooltipProvider delayDuration={300}>
@@ -99,16 +106,19 @@ export function HighlightedContent({ content, graphContext }: HighlightedContent
           return (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                <span className={`${colors.bg} ${colors.text} font-medium px-0.5 rounded cursor-help border-b ${colors.border} border-dashed`}>
+                <button
+                  onClick={() => handleEntityClick(matchedEntity.name)}
+                  className={`${colors.bg} ${colors.text} font-medium px-0.5 rounded cursor-pointer border-b ${colors.border} border-dashed hover:opacity-80 transition-opacity`}
+                >
                   {part}
-                </span>
+                </button>
               </TooltipTrigger>
               <TooltipContent side="top" className="text-xs">
                 <div className="flex items-center gap-1.5">
                   <Badge variant="secondary" className={`h-4 px-1.5 text-[10px] ${colors.bg} ${colors.text}`}>
                     {colors.label}
                   </Badge>
-                  <span className="text-muted-foreground">from Knowledge Graph</span>
+                  <span className="text-muted-foreground">Click to view in Knowledge Graph</span>
                 </div>
               </TooltipContent>
             </Tooltip>

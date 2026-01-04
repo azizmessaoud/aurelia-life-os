@@ -66,9 +66,10 @@ interface NodePosition {
 
 interface KnowledgeGraphViewProps {
   className?: string;
+  focusEntityName?: string | null;
 }
 
-export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
+export function KnowledgeGraphView({ className, focusEntityName }: KnowledgeGraphViewProps) {
   const { entities, relationships, isLoading } = useKnowledgeGraph();
   const [selectedNode, setSelectedNode] = useState<KnowledgeEntity | null>(null);
   const [positions, setPositions] = useState<Record<string, NodePosition>>({});
@@ -85,6 +86,18 @@ export function KnowledgeGraphView({ className }: KnowledgeGraphViewProps) {
         .map(e => e.id)
     );
   }, [entities]);
+
+  // Auto-select entity when focusEntityName is provided
+  useEffect(() => {
+    if (focusEntityName && entities.length > 0) {
+      const matchedEntity = entities.find(
+        e => e.name.toLowerCase() === focusEntityName.toLowerCase()
+      );
+      if (matchedEntity) {
+        setSelectedNode(matchedEntity);
+      }
+    }
+  }, [focusEntityName, entities]);
 
   // Filter relationships for backbone view
   const filteredRelationships = useMemo(() => {
