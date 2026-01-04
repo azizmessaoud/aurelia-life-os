@@ -90,9 +90,15 @@ async function extractEntitiesFromConversation(userMessage: string, assistantMes
   }
 }
 
+export type GraphContext = {
+  context: string | null;
+  entities_found: number;
+};
+
 export function useStreamingChat() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
+  const [lastGraphContext, setLastGraphContext] = useState<GraphContext | null>(null);
   const saveMessage = useSaveMessage();
   const queryClient = useQueryClient();
 
@@ -110,6 +116,7 @@ export function useStreamingChat() {
     ) => {
       setIsStreaming(true);
       setStreamingContent("");
+      setLastGraphContext(null);
 
       // Save user message
       await saveMessage.mutateAsync({ role: "user", content: userMessage });
@@ -168,6 +175,16 @@ export function useStreamingChat() {
 
             try {
               const parsed = JSON.parse(jsonStr);
+              
+              // Check for graph context metadata
+              if (parsed.type === "graph_context") {
+                setLastGraphContext({
+                  context: parsed.context,
+                  entities_found: parsed.entities_found,
+                });
+                continue;
+              }
+              
               const content = parsed.choices?.[0]?.delta?.content;
               if (content) {
                 fullContent += content;
@@ -208,5 +225,6 @@ export function useStreamingChat() {
     sendMessage,
     isStreaming,
     streamingContent,
+    lastGraphContext,
   };
 }
