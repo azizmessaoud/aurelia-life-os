@@ -5,6 +5,127 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// VETO Thresholds - Critical limits that trigger intervention
+const VETO_THRESHOLDS = {
+  CRITICAL_ENERGY: 3,           // Energy below 3/10 triggers critical VETO
+  EXAM_WARNING_DAYS: 3,         // Exam within 3 days triggers VETO
+  WIP_LIMIT: 2,                 // Max 2 active projects
+  OVERWORK_DAILY_HOURS: 6,      // Max 6 hours/day average
+};
+
+interface VetoResult {
+  triggered: boolean;
+  reason: string;
+  message: string;
+  severity: "critical" | "warning";
+  allowOverride: boolean;
+  recoveryActions: string[];
+}
+
+// Helper to calculate days until a date
+function daysUntil(dateString: string): number {
+  const target = new Date(dateString);
+  const now = new Date();
+  const diff = target.getTime() - now.getTime();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+// Check VETO rules before agent deliberation
+function checkVetoRules(context: any, userMessage: string): VetoResult | null {
+  const results: VetoResult[] = [];
+
+  // 1. Critical Energy Check
+  if (context.recentEnergy && context.recentEnergy < VETO_THRESHOLDS.CRITICAL_ENERGY) {
+    results.push({
+      triggered: true,
+      reason: "CRITICAL_ENERGY",
+      message: `Your energy is at ${context.recentEnergy}/10 — critically low. Recovery is required before any new commitments.`,
+      severity: "critical",
+      allowOverride: false,
+      recoveryActions: [
+        "Log a recovery day in your calendar",
+        "Get at least 8 hours of sleep tonight",
+        "Postpone non-essential decisions by 24 hours",
+        "Do one small thing that brings you joy"
+      ]
+    });
+  }
+
+  // 2. Imminent Exam Check
+  const upcomingDeadlines = context.academicContext?.upcomingDeadlines || [];
+  const imminentExams = upcomingDeadlines.filter(
+    (d: any) => d.is_exam && daysUntil(d.due_date) <= VETO_THRESHOLDS.EXAM_WARNING_DAYS
+  );
+  
+  if (imminentExams.length > 0) {
+    const exam = imminentExams[0];
+    const days = daysUntil(exam.due_date);
+    results.push({
+      triggered: true,
+      reason: "EXAM_IMMINENT",
+      message: `${exam.title} is in ${days} day${days !== 1 ? 's' : ''}. Study-only mode activated.`,
+      severity: "critical",
+      allowOverride: false,
+      recoveryActions: [
+        `Focus all available time on ${exam.title} preparation`,
+        "Postpone all project work until after the exam",
+        "Use Pomodoro technique for focused study sessions",
+        "Review course materials and practice problems"
+      ]
+    });
+  }
+
+  // 3. WIP Limit Check (only for new project requests)
+  const activeProjects = context.projects?.filter((p: any) => p.status === 'active') || [];
+  if (activeProjects.length >= VETO_THRESHOLDS.WIP_LIMIT) {
+    const isNewProjectRequest = /start|new|begin|launch|create.*project|add.*project/i.test(userMessage);
+    if (isNewProjectRequest) {
+      results.push({
+        triggered: true,
+        reason: "WIP_LIMIT_REACHED",
+        message: `WIP limit reached (${activeProjects.length}/${VETO_THRESHOLDS.WIP_LIMIT} active projects). Archive or complete one before starting another.`,
+        severity: "warning",
+        allowOverride: true,
+        recoveryActions: [
+          "Review current projects and identify one to archive",
+          "Complete the project closest to done",
+          "Defer new project idea to your backlog",
+          "Consider if this urgency is real or ADHD-driven"
+        ]
+      });
+    }
+  }
+
+  // 4. Overwork Check
+  if (context.weeklyCapacity?.actual_hours) {
+    const avgDailyHours = context.weeklyCapacity.actual_hours / 7;
+    if (avgDailyHours > VETO_THRESHOLDS.OVERWORK_DAILY_HOURS) {
+      results.push({
+        triggered: true,
+        reason: "OVERWORK_DETECTED",
+        message: `Averaging ${avgDailyHours.toFixed(1)} hours/day this week (limit: ${VETO_THRESHOLDS.OVERWORK_DAILY_HOURS}h). Reduce load to prevent burnout.`,
+        severity: "warning",
+        allowOverride: true,
+        recoveryActions: [
+          "Cancel or postpone one commitment today",
+          "Schedule a half-day off this week",
+          "Set a hard stop time for work today",
+          "Identify what's driving the overwork"
+        ]
+      });
+    }
+  }
+
+  // Return the highest severity VETO (critical > warning)
+  const criticalVeto = results.find(r => r.severity === "critical");
+  if (criticalVeto) return criticalVeto;
+  
+  const warningVeto = results.find(r => r.severity === "warning");
+  if (warningVeto) return warningVeto;
+
+  return null;
+}
+
 // Agent definitions with specialized roles
 const AGENTS = {
   PLANNER: {
@@ -229,7 +350,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, context, selectedAgents } = await req.json();
+    const { message, context, selectedAgents, forceOverride } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
@@ -241,6 +362,29 @@ serve(async (req) => {
     }
 
     console.log("Agent Council convened for:", message.substring(0, 50));
+
+    // Check VETO rules FIRST (before calling any agents)
+    const vetoResult = checkVetoRules(context || {}, message);
+    
+    if (vetoResult && vetoResult.triggered && !forceOverride) {
+      console.log("VETO triggered:", vetoResult.reason, "- Severity:", vetoResult.severity);
+      
+      return new Response(
+        JSON.stringify({
+          success: true,
+          vetoActive: true,
+          veto: vetoResult,
+          agentResponses: [],
+          synthesis: null,
+          timestamp: new Date().toISOString()
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (forceOverride && vetoResult) {
+      console.log("VETO override requested for:", vetoResult.reason);
+    }
 
     // Determine which agents to use (default: all)
     const agentsToUse = selectedAgents?.length > 0 
@@ -266,6 +410,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
+        vetoActive: false,
+        veto: null,
         agentResponses,
         synthesis,
         timestamp: new Date().toISOString()

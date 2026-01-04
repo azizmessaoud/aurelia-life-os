@@ -12,6 +12,7 @@ import {
   AgentResponse,
   CouncilContext 
 } from "@/hooks/useAgentCouncil";
+import { VetoAlert } from "./VetoAlert";
 import { 
   Send, 
   Users, 
@@ -93,10 +94,12 @@ export function AgentCouncilView({ context, className }: AgentCouncilViewProps) 
     currentPhase,
     agentResponses,
     synthesis,
+    vetoResult,
     error,
   } = useAgentCouncil();
 
   const [input, setInput] = useState("");
+  const [lastMessage, setLastMessage] = useState("");
   const [selectedAgents, setSelectedAgents] = useState<AgentType[]>(
     Object.keys(AGENT_INFO) as AgentType[]
   );
@@ -111,12 +114,19 @@ export function AgentCouncilView({ context, className }: AgentCouncilViewProps) 
 
   const handleSubmit = async () => {
     if (!input.trim() || isProcessing || selectedAgents.length === 0) return;
+    setLastMessage(input.trim());
     await conveneCouncil(input.trim(), context, selectedAgents);
+  };
+
+  const handleOverride = async () => {
+    if (!lastMessage || isProcessing) return;
+    await conveneCouncil(lastMessage, context, selectedAgents, true);
   };
 
   const handleReset = () => {
     reset();
     setInput("");
+    setLastMessage("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -125,6 +135,8 @@ export function AgentCouncilView({ context, className }: AgentCouncilViewProps) 
       handleSubmit();
     }
   };
+
+  const hasResults = agentResponses.length > 0 || synthesis || vetoResult;
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -139,7 +151,7 @@ export function AgentCouncilView({ context, className }: AgentCouncilViewProps) 
             Multi-agent reasoning for complex decisions
           </p>
         </div>
-        {(agentResponses.length > 0 || synthesis) && (
+        {hasResults && (
           <Button variant="outline" size="sm" onClick={handleReset}>
             <RotateCcw className="h-4 w-4 mr-2" />
             New Question
@@ -148,7 +160,7 @@ export function AgentCouncilView({ context, className }: AgentCouncilViewProps) 
       </div>
 
       {/* Agent Selection */}
-      {!isProcessing && agentResponses.length === 0 && (
+      {!isProcessing && !hasResults && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium">Select Agents</CardTitle>
@@ -183,7 +195,7 @@ export function AgentCouncilView({ context, className }: AgentCouncilViewProps) 
       )}
 
       {/* Input */}
-      {!isProcessing && agentResponses.length === 0 && (
+      {!isProcessing && !hasResults && (
         <div className="relative">
           <Textarea
             value={input}
@@ -214,8 +226,17 @@ export function AgentCouncilView({ context, className }: AgentCouncilViewProps) 
         </div>
       )}
 
+      {/* VETO Alert */}
+      {vetoResult && vetoResult.triggered && (
+        <VetoAlert 
+          veto={vetoResult} 
+          onOverride={vetoResult.allowOverride ? handleOverride : undefined}
+          isOverriding={isProcessing}
+        />
+      )}
+
       {/* Agent Responses Grid */}
-      {agentResponses.length > 0 && (
+      {agentResponses.length > 0 && !vetoResult && (
         <div className="space-y-4">
           <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
             <Users className="h-4 w-4" />
@@ -230,7 +251,7 @@ export function AgentCouncilView({ context, className }: AgentCouncilViewProps) 
       )}
 
       {/* Synthesis */}
-      {(synthesis || currentPhase === "synthesis") && (
+      {(synthesis || currentPhase === "synthesis") && !vetoResult && (
         <Card className="border-primary/30 bg-primary/5">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-primary">
@@ -303,6 +324,11 @@ export function AgentCouncilView({ context, className }: AgentCouncilViewProps) 
         {context.academicContext && (
           <Badge variant="outline">
             📚 {context.academicContext.upcomingDeadlines?.length || 0} deadlines
+          </Badge>
+        )}
+        {context.recentEnergy && (
+          <Badge variant={context.recentEnergy < 4 ? "destructive" : "outline"}>
+            ⚡ Energy: {context.recentEnergy}/10
           </Badge>
         )}
       </div>
