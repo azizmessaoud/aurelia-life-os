@@ -236,9 +236,9 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold gradient-text">Dashboard</h1>
+            <h1 className="text-3xl font-bold gradient-text">Welcome back, Aziz</h1>
             <p className="text-muted-foreground">
-              {format(new Date(), "EEEE, MMMM d")}
+              {format(new Date(), "EEEE, MMMM d")} • ESPRIT 4th Year • Data Science
             </p>
           </div>
           <Button 
