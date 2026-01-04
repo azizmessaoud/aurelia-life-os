@@ -2,11 +2,17 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useCallback } from "react";
 
+export type GraphContext = {
+  context: string | null;
+  entities_found: number;
+};
+
 export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
   created_at: string;
+  graph_context?: GraphContext | null;
 };
 
 export function useChatMessages() {
@@ -29,7 +35,11 @@ export function useSaveMessage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (message: { role: "user" | "assistant"; content: string }) => {
+    mutationFn: async (message: { 
+      role: "user" | "assistant"; 
+      content: string;
+      graph_context?: GraphContext | null;
+    }) => {
       const { data, error } = await supabase
         .from("chat_messages")
         .insert(message)
@@ -90,15 +100,10 @@ async function extractEntitiesFromConversation(userMessage: string, assistantMes
   }
 }
 
-export type GraphContext = {
-  context: string | null;
-  entities_found: number;
-};
-
 export function useStreamingChat() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
-  const [lastGraphContext, setLastGraphContext] = useState<GraphContext | null>(null);
+  const [currentGraphContext, setCurrentGraphContext] = useState<GraphContext | null>(null);
   const saveMessage = useSaveMessage();
   const queryClient = useQueryClient();
 
@@ -116,7 +121,7 @@ export function useStreamingChat() {
     ) => {
       setIsStreaming(true);
       setStreamingContent("");
-      setLastGraphContext(null);
+      setCurrentGraphContext(null);
 
       // Save user message
       await saveMessage.mutateAsync({ role: "user", content: userMessage });
@@ -178,7 +183,7 @@ export function useStreamingChat() {
               
               // Check for graph context metadata
               if (parsed.type === "graph_context") {
-                setLastGraphContext({
+                setCurrentGraphContext({
                   context: parsed.context,
                   entities_found: parsed.entities_found,
                 });
@@ -197,9 +202,13 @@ export function useStreamingChat() {
           }
         }
 
-        // Save assistant message
+        // Save assistant message with graph context
         if (fullContent) {
-          await saveMessage.mutateAsync({ role: "assistant", content: fullContent });
+          await saveMessage.mutateAsync({ 
+            role: "assistant", 
+            content: fullContent,
+            graph_context: currentGraphContext,
+          });
           
           // Trigger entity extraction in the background (non-blocking)
           extractEntitiesFromConversation(userMessage, fullContent);
@@ -225,6 +234,5 @@ export function useStreamingChat() {
     sendMessage,
     isStreaming,
     streamingContent,
-    lastGraphContext,
   };
 }

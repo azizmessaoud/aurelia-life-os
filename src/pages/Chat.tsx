@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useChatMessages, useStreamingChat, useClearChat, GraphContext } from "@/hooks/useChat";
+import { useChatMessages, useStreamingChat, useClearChat, GraphContext, ChatMessage } from "@/hooks/useChat";
 import { useActiveProjects } from "@/hooks/useProjects";
 import { useActiveOpportunities } from "@/hooks/useOpportunities";
 import { useCurrentWeekCapacity } from "@/hooks/useWeeklyCapacity";
@@ -15,11 +15,21 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
-function MessageBubble({ role, content, isStreaming }: { role: string; content: string; isStreaming?: boolean }) {
+function MessageBubble({ 
+  role, 
+  content, 
+  isStreaming,
+  graphContext 
+}: { 
+  role: string; 
+  content: string; 
+  isStreaming?: boolean;
+  graphContext?: GraphContext | null;
+}) {
   const isUser = role === "user";
 
   return (
-    <div className={cn("flex", isUser ? "justify-end" : "justify-start")}>
+    <div className={cn("flex flex-col", isUser ? "items-end" : "items-start")}>
       <div className={cn(
         "max-w-[80%] rounded-2xl px-4 py-3 animate-fade-in",
         isUser 
@@ -39,6 +49,7 @@ function MessageBubble({ role, content, isStreaming }: { role: string; content: 
           )}
         </div>
       </div>
+      {!isUser && graphContext && <GraphContextPanel graphContext={graphContext} />}
     </div>
   );
 }
@@ -89,7 +100,7 @@ export default function ChatPage() {
   const { data: weeklyCapacity } = useCurrentWeekCapacity();
   const { data: todayMinutes = 0 } = useTodaysDeepWorkMinutes();
   const { data: recentSessions = [] } = useDeepWorkSessions();
-  const { sendMessage, isStreaming, streamingContent, lastGraphContext } = useStreamingChat();
+  const { sendMessage, isStreaming, streamingContent } = useStreamingChat();
   const clearChat = useClearChat();
 
   const [input, setInput] = useState("");
@@ -184,13 +195,15 @@ export default function ChatPage() {
             ) : (
               <div className="space-y-4">
                 {messages.map((msg) => (
-                  <MessageBubble key={msg.id} role={msg.role} content={msg.content} />
+                  <MessageBubble 
+                    key={msg.id} 
+                    role={msg.role} 
+                    content={msg.content} 
+                    graphContext={msg.graph_context}
+                  />
                 ))}
                 {isStreaming && streamingContent && (
                   <MessageBubble role="assistant" content={streamingContent} isStreaming />
-                )}
-                {!isStreaming && lastGraphContext && (
-                  <GraphContextPanel graphContext={lastGraphContext} />
                 )}
                 <div ref={messagesEndRef} />
               </div>
