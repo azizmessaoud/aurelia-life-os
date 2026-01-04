@@ -11,7 +11,8 @@ import {
   Compass,
   Target,
   Brain,
-  BookOpen
+  BookOpen,
+  GraduationCap
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,7 @@ const navItems = [
   { icon: Compass, label: "Life GPS", path: "/gps" },
   { icon: Target, label: "Goals", path: "/goals" },
   { icon: Brain, label: "Intelligence", path: "/intelligence" },
+  { icon: GraduationCap, label: "Academic", path: "/academic" },
   { icon: FolderKanban, label: "Projects", path: "/projects" },
   { icon: Timer, label: "Deep Work", path: "/deep-work" },
   { icon: TrendingUp, label: "Capacity", path: "/capacity" },

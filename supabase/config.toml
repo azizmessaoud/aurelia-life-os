@@ -14,3 +14,9 @@ verify_jwt = false
 
 [functions.graphrag-query]
 verify_jwt = false
+
+[functions.firecrawl-scrape]
+verify_jwt = false
+
+[functions.blackboard-sync]
+verify_jwt = false
