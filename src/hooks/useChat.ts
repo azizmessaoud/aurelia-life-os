@@ -82,13 +82,19 @@ export function useClearChat() {
 // Extract entities from conversation in the background
 async function extractEntitiesFromConversation(userMessage: string, assistantMessage: string) {
   try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      console.warn("No auth session for entity extraction");
+      return;
+    }
+
     const response = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-entities`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           user_message: userMessage,
@@ -137,13 +143,18 @@ export function useStreamingChat() {
       await saveMessage.mutateAsync({ role: "user", content: userMessage });
 
       try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          throw new Error("Please sign in to chat with AURELIA");
+        }
+
         const response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/aurelia-chat`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+              Authorization: `Bearer ${session.access_token}`,
             },
             body: JSON.stringify({
               message: userMessage,

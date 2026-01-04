@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { authenticateRequest, unauthorizedResponse, validateString } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -349,16 +350,28 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Authenticate request
+  const { user, error: authError } = await authenticateRequest(req);
+  if (authError || !user) {
+    return unauthorizedResponse(authError || "Unauthorized", corsHeaders);
+  }
+
   try {
-    const { message, context, selectedAgents, forceOverride } = await req.json();
+    const body = await req.json();
+    const message = validateString(body.message, 5000);
+    
+    if (!message) {
+      return new Response(
+        JSON.stringify({ error: "Invalid or missing message" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { context, selectedAgents, forceOverride } = body;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
-    }
-
-    if (!message) {
-      throw new Error("Message is required");
     }
 
     console.log("Agent Council convened for:", message.substring(0, 50));
@@ -395,7 +408,7 @@ serve(async (req) => {
     const agentPromises = agentsToUse.map((agentKey: string) => {
       const agent = AGENTS[agentKey as keyof typeof AGENTS];
       if (!agent) return null;
-      return callAgent(agentKey, agent, message, context || {}, LOVABLE_API_KEY);
+      return callAgent(agentKey, agent, message, context || {}, LOVABLE_API_KEY!);
     }).filter(Boolean);
 
     const agentResponses = await Promise.all(agentPromises);
@@ -403,7 +416,7 @@ serve(async (req) => {
     console.log("All agents responded, synthesizing...");
 
     // Phase 2: Orchestrator synthesizes responses
-    const synthesis = await synthesizeResponses(message, agentResponses, LOVABLE_API_KEY);
+    const synthesis = await synthesizeResponses(message, agentResponses, LOVABLE_API_KEY!);
 
     console.log("Council deliberation complete");
 

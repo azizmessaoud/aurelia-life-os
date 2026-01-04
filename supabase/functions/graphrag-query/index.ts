@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { authenticateRequest, unauthorizedResponse, validateString, sanitizeForIlike } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -87,10 +88,11 @@ async function findMatchingEntities(
   const matchedEntities: Entity[] = [];
   
   for (const concept of concepts) {
+    const sanitized = sanitizeForIlike(concept);
     const { data } = await supabase
       .from("knowledge_entities")
       .select("*")
-      .or(`name.ilike.%${concept}%,description.ilike.%${concept}%`)
+      .or(`name.ilike.%${sanitized}%,description.ilike.%${sanitized}%`)
       .limit(5);
     
     if (data) {
@@ -290,8 +292,24 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Authenticate request
+  const { user, error: authError } = await authenticateRequest(req);
+  if (authError || !user) {
+    return unauthorizedResponse(authError || "Unauthorized", corsHeaders);
+  }
+
   try {
-    const { question, include_high_importance = true } = await req.json();
+    const body = await req.json();
+    const question = validateString(body.question, 2000);
+    
+    if (!question) {
+      return new Response(
+        JSON.stringify({ error: "Invalid or missing question" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    const include_high_importance = body.include_high_importance ?? true;
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -309,7 +327,7 @@ serve(async (req) => {
     console.log("GraphRAG query:", question);
 
     // Step 1: Extract key concepts from the question
-    const concepts = await extractQueryConcepts(question, LOVABLE_API_KEY);
+    const concepts = await extractQueryConcepts(question, LOVABLE_API_KEY!);
     console.log("Extracted concepts:", concepts);
 
     // Step 2: Find matching entities in the graph

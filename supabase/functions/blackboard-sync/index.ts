@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { authenticateRequest, unauthorizedResponse, validateUrl } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -193,6 +194,12 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Authenticate request
+  const { user, error: authError } = await authenticateRequest(req);
+  if (authError || !user) {
+    return unauthorizedResponse(authError || "Unauthorized", corsHeaders);
+  }
+
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
@@ -209,11 +216,23 @@ Deno.serve(async (req) => {
   try {
     const { blackboardUrl, syncType, courseUrls }: SyncRequest = await req.json();
 
-    if (!blackboardUrl) {
+    if (!blackboardUrl || !validateUrl(blackboardUrl)) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Blackboard URL is required' }),
+        JSON.stringify({ success: false, error: 'Valid Blackboard URL is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Validate course URLs if provided
+    if (courseUrls) {
+      for (const url of courseUrls) {
+        if (!validateUrl(url)) {
+          return new Response(
+            JSON.stringify({ success: false, error: `Invalid course URL: ${url}` }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
     }
 
     // Create sync log entry
