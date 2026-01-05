@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useAcademicMaterials, useAcademicCourses, AcademicMaterial } from "@/hooks/useAcademic";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   BookOpen, 
   ChevronDown, 
@@ -31,6 +32,29 @@ interface MaterialItemProps {
 
 function MaterialItem({ material }: MaterialItemProps) {
   const [showSummary, setShowSummary] = useState(false);
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function getSignedUrl() {
+      if (material.file_url) {
+        // Check if it's already an external URL (not a storage path)
+        if (material.file_url.startsWith('http://') || material.file_url.startsWith('https://')) {
+          setSignedUrl(material.file_url);
+          return;
+        }
+        
+        // Get signed URL for storage files
+        const { data } = await supabase.storage
+          .from('academic-materials')
+          .createSignedUrl(material.file_url, 3600); // 1 hour expiry
+        
+        if (data?.signedUrl) {
+          setSignedUrl(data.signedUrl);
+        }
+      }
+    }
+    getSignedUrl();
+  }, [material.file_url]);
   
   return (
     <div className="flex items-start gap-3 p-3 rounded-lg border hover:bg-accent/50 transition-all">
@@ -41,9 +65,9 @@ function MaterialItem({ material }: MaterialItemProps) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="font-medium truncate">{material.title}</span>
-          {material.file_url && (
+          {signedUrl && (
             <Button variant="ghost" size="icon" className="h-6 w-6" asChild>
-              <a href={material.file_url} target="_blank" rel="noopener noreferrer">
+              <a href={signedUrl} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-3 w-3" />
               </a>
             </Button>
