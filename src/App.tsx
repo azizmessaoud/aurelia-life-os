@@ -13,6 +13,7 @@ import KnowledgeGraph from "./pages/KnowledgeGraph";
 import Council from "./pages/Council";
 import Goals from "./pages/Goals";
 import GPSCommandCenter from "./pages/GPSCommandCenter";
+import GPSCoach from "./pages/GPSCoach";
 import Intelligence from "./pages/Intelligence";
 import WeeklyReview from "./pages/WeeklyReview";
 import AcademicHub from "./pages/AcademicHub";
@@ -29,6 +30,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/gps" element={<GPSCommandCenter />} />
+          <Route path="/gps-coach" element={<GPSCoach />} />
           <Route path="/goals" element={<Goals />} />
           <Route path="/intelligence" element={<Intelligence />} />
           <Route path="/academic" element={<AcademicHub />} />

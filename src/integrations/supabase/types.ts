@@ -507,6 +507,42 @@ export type Database = {
         }
         Relationships: []
       }
+      gps_blueprints: {
+        Row: {
+          blueprint_markdown: string | null
+          coaching_history: Json | null
+          created_at: string
+          current_step: number
+          goal_title: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          blueprint_markdown?: string | null
+          coaching_history?: Json | null
+          created_at?: string
+          current_step?: number
+          goal_title: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          blueprint_markdown?: string | null
+          coaching_history?: Json | null
+          created_at?: string
+          current_step?: number
+          goal_title?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       health_scores: {
         Row: {
           calculated_at: string
