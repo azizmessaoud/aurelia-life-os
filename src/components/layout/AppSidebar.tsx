@@ -12,7 +12,8 @@ import {
   Target,
   Brain,
   BookOpen,
-  GraduationCap
+  GraduationCap,
+  Route
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Compass, label: "Life GPS", path: "/gps" },
+  { icon: Route, label: "GPS Coach", path: "/gps-coach" },
   { icon: Target, label: "Goals", path: "/goals" },
   { icon: Brain, label: "Intelligence", path: "/intelligence" },
   { icon: GraduationCap, label: "Academic", path: "/academic" },

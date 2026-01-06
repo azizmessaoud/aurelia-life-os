@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.blackboard-sync]
 verify_jwt = false
+
+[functions.gps-coach]
+verify_jwt = false
