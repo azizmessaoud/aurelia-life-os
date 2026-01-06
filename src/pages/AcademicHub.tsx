@@ -1,21 +1,21 @@
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WeeklyScheduleGrid } from "@/components/academic/WeeklyScheduleGrid";
 import { AssignmentList } from "@/components/academic/AssignmentList";
 import { CourseList } from "@/components/academic/CourseList";
 import { MaterialsList } from "@/components/academic/MaterialsList";
+import { StudyTutor } from "@/components/academic/StudyTutor";
 import { BlackboardSyncButton } from "@/components/academic/BlackboardSyncButton";
 import { useUpcomingAssignments, useTodaySchedule } from "@/hooks/useAcademic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { 
-  Calendar, 
   Clock, 
   FileText, 
   BookOpen, 
   GraduationCap,
-  AlertTriangle
+  Brain,
+  Calendar
 } from "lucide-react";
 
 function QuickStats() {
@@ -147,11 +147,11 @@ export default function AcademicHub() {
           <QuickStats />
 
           {/* Main Content Tabs */}
-          <Tabs defaultValue="schedule" className="space-y-4">
+          <Tabs defaultValue="tutor" className="space-y-4">
             <TabsList className="grid w-full max-w-lg grid-cols-4">
-              <TabsTrigger value="schedule" className="gap-2">
-                <Calendar className="h-4 w-4" />
-                Schedule
+              <TabsTrigger value="tutor" className="gap-2">
+                <Brain className="h-4 w-4" />
+                Study Tutor
               </TabsTrigger>
               <TabsTrigger value="assignments" className="gap-2">
                 <FileText className="h-4 w-4" />
@@ -167,8 +167,8 @@ export default function AcademicHub() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="schedule" className="mt-4">
-              <WeeklyScheduleGrid />
+            <TabsContent value="tutor" className="mt-4">
+              <StudyTutor />
             </TabsContent>
 
             <TabsContent value="assignments" className="mt-4">
